@@ -1,37 +1,26 @@
 # My stm32 tank
 
 #### 介绍
-华南理工大学2022年无限机甲杯比赛中碱基互补配对队的电控代码工程
+华南理工大学2022年无限机甲杯比赛中碱基互补配队的电控代码工程
 
-#### 软件架构
-软件架构说明
+作者：碱基互补配队电控组成员：林瑞创，江浩炯
 
+### 整体架构
 
-#### 安装教程
+##### 硬件
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+双MCU控制，stm32f407vet6作底盘主控，stm32f411ceu6作炮台主控
 
-#### 使用说明
+底盘是四驱小车，四个带编码器的减速电机，两个at8236电机驱动板，前后两个舵机爬台阶结构
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+炮台目前一自由度，一个舵机控制俯仰角，一个带编码器的蜗杆电机控制弹舱拨盘，两个555电机驱动摩擦轮。
 
-#### 参与贡献
+##### 软件
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+基于stm32 HAL库编写，stm32cubemx+keil5，面向对象思想模块化设计
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+
+
+#### 
