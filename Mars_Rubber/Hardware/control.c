@@ -151,7 +151,17 @@ void ps2_control(u8 order){
 			
 			MOTOR_reset(),control_mode=1;	delay_ms(500);
 			
-			
+			Steer_f.angle = 80;	 
+			delay_ms(3000);	
+			Back_L.target_angle = 400; 
+			Back_R.target_angle = 400;
+			delay_ms(3000);	
+			Steer_f.angle =0;
+			Steer_b.angle = 80;
+			delay_ms(3000);
+			Forward_L.target_angle = 1080; 
+			Forward_R.target_angle = 1080;
+			delay_ms(3000);
 	
 			MOTOR_reset(),control_mode=0;	delay_ms(500);
 			

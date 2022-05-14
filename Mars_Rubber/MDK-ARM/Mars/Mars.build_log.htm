@@ -21,17 +21,26 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
 Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
-D:\Documents\MCU Study\My Tank\Mars_Rubber_5_9\MDK-ARM\Mars.uvprojx
+D:\Documents\my-stm32-tank\Mars_Rubber\MDK-ARM\Mars.uvprojx
 Project File Date:  05/07/2022
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'E:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Mars'
-compiling steer.c...
+compiling control.c...
+..\Hardware\control.c(322): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	Back_L.target_speed =  1.5*Forward_L.target_speed;
+..\Hardware\control.c(336): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	Back_L.target_speed =1.5*Forward_L.target_speed;
+..\Hardware\control.c(351): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	Back_R.target_speed =1.5*Forward_R.target_speed;
+..\Hardware\control.c(366): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	Back_L.target_speed = 1.5*Forward_L.target_speed;
+..\Hardware\control.c: 4 warnings, 0 errors
 linking...
-Program Size: Code=25756 RO-data=520 RW-data=104 ZI-data=4160  
+Program Size: Code=25848 RO-data=520 RW-data=104 ZI-data=4160  
 FromELF: creating hex file...
-"Mars\Mars.axf" - 0 Error(s), 0 Warning(s).
+"Mars\Mars.axf" - 0 Error(s), 4 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -55,7 +64,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.4.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:05
+Build Time Elapsed:  00:00:04
 </pre>
 </body>
 </html>
