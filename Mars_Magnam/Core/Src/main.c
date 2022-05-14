@@ -190,7 +190,7 @@ int main(void)
 /**/
 	  
 	 if(ps2_mode){			//ps2手柄控制模式
-	  if( !PS2_RedLight()){ //手柄为绿灯模式
+//	  if( !PS2_RedLight()){ //手柄为绿灯模式
 		  
 		  delay_ms(50);	 //延时很重要不可去
 		  
@@ -198,7 +198,7 @@ int main(void)
 		  
 		  ps2_control( PS2_DataKey() );
 		  
-	  }else{				//手柄为红灯模式
+/*	  }else{				//手柄为红灯模式
 		  
 		  delay_ms(50);	 //延时很重要不可去
 		  
@@ -208,7 +208,7 @@ int main(void)
 		  ps2_angle();
 			
 	  }
-	}
+*/	}
   }
   /* USER CODE END 3 */
 }
@@ -280,7 +280,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	
 	if(huart ->Instance == USART2){	//串口二，与树莓派通信
 		
-		vision_control(receiver2);
+		HAL_UART_Transmit(&huart1,(uint8_t *)&receiver2,1,1);
+	//	vision_control(receiver2);
 		
 		HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
 	}

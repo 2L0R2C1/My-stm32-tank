@@ -465,8 +465,8 @@ void bluetooth_control(u8 order)
 		case 'w': HAL_UART_Transmit(&huart3,(u8*)&order,1,1);break;
 		case 'k': HAL_UART_Transmit(&huart3,(u8*)&order,1,1);break;
 			
-		case '#': ps2_mode = 1;	break;//改蓝牙控制为ps2手柄控制
-		case '$': ps2_mode = 0;	break;								 //改ps2控制为蓝牙控制
+		case '#': ps2_mode = 1;	printf("turn to ps2\r\n"); break;//改蓝牙控制为ps2手柄控制
+		case '$': ps2_mode = 0;	printf("turn to bluetooth\r\n");	break;								 //改ps2控制为蓝牙控制
 		
 		case '~' : {	//机动模式
 			MOTOR_reset();

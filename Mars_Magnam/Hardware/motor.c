@@ -3,6 +3,7 @@
 #include "tim.h"
 #include "delay.h"
 #include "usart.h"
+#include "string.h"
 
 /*********************************************
 ³õÊ¼»¯ËùÓĞµç»úµÄËùÓĞÏà¹Ø²ÎÊı£¬
@@ -44,9 +45,9 @@ void MOTOR_Init(void){
 	Back_L.channelpwm2    = TIM_CHANNEL_1;
 	Back_R.channelpwm2    = TIM_CHANNEL_4;
 	
-//	__HAL_TIM_CLEAR_IT(&htim6,TIM_IT_UPDATE);	//ÇåÁãtim6ÖĞ¶Ï±êÖ¾Î»(¶¨Ê±ÖĞ¶Ï»ñÈ¡µç»ú×´Ì¬²¢·´À¡£©
-//	__HAL_TIM_SetCounter(&htim6,0);				//¹éÁãtim6¼ÆÊıÖµ
-//	HAL_TIM_Base_Start_IT(&htim6);				//¿ªÆôtim6¼ÆÊıÖĞ¶Ï
+	__HAL_TIM_CLEAR_IT(&htim6,TIM_IT_UPDATE);	//ÇåÁãtim6ÖĞ¶Ï±êÖ¾Î»(¶¨Ê±ÖĞ¶Ï»ñÈ¡µç»ú×´Ì¬²¢·´À¡£©
+	__HAL_TIM_SetCounter(&htim6,0);				//¹éÁãtim6¼ÆÊıÖµ
+	HAL_TIM_Base_Start_IT(&htim6);				//¿ªÆôtim6¼ÆÊıÖĞ¶Ï
 	
 	
 /*	Forward_L.in1_port = Forward_L_IN1_GPIO_Port;	Forward_L.in2_port = Forward_L_IN2_GPIO_Port;
@@ -68,8 +69,8 @@ void MOTOR_Init(void){
 
 void MOTOR_Tim_Init(MOTOR_TypeDef *motor){			//ÆôÓÃÄ³¸öµç»ú
 
-	set_pid(&motor->k_speed, 15, 3, 50);
-	set_pid(&motor->k_angle, 50, 0.5, 100);
+	set_pid(&motor->k_speed, 20, 5, 0);
+	set_pid(&motor->k_angle, 50, 0.5, 0);
 	set_pid(&motor->k_double, 1.2, 0.005, 25);
 	
 	motor->actual_angle=0;
@@ -146,15 +147,14 @@ void MOTOR_reset(){	//ÖØÖÃËùÓĞµç»ú
 
 
 float get_speed(float ns, MOTOR_TypeDef *motor){		//²âËÙ
-	volatile float speed = 0.0f;
 	
 	motor->capture_count = __HAL_TIM_GetCounter(&motor->encoder) + (motor->encoder_overflow*0xffff);	//µ±Ç°²¶»ñÖµ = ²¶»ñ¼ÆÊıÆ÷µÄÖµ + Òç³ö´ÎÊı*²¶»ñ¼ÆÊıÆ÷×î´ó×°ÔØÖµ
 
-	speed = (float) (motor->capture_count - motor->last_count) / (beipin*xianshu*jiansubi*ns); //Êµ¼Ê×ªËÙ = £¨µ±Ç°²¶»ñÖµ - Ç°Ò»¶ÎÊ±¼ä²¶»ñÖµ£© / £¨±¶ÆµÊı*ÏßÊı*Õâ¶ÎÊ±¼ä£©
+	motor->actual_speed = (float) (motor->capture_count - motor->last_count) / (beipin*xianshu*jiansubi*ns); //Êµ¼Ê×ªËÙ = £¨µ±Ç°²¶»ñÖµ - Ç°Ò»¶ÎÊ±¼ä²¶»ñÖµ£© / £¨±¶ÆµÊı*ÏßÊı*Õâ¶ÎÊ±¼ä£©
 	
-	if(speed < SPEED_MAX && speed > -SPEED_MAX)motor->last_count = motor->capture_count;	//ÌŞ³ı¹ı´ó²âÁ¿Öµ£¨Ó²¼şÎÆ²¨ÓĞÔëµã£©
+	motor->last_count = motor->capture_count;
 	
-	return speed;
+	return motor->actual_speed;
 }	
 
 float get_angle(MOTOR_TypeDef *motor){		//²â½Ç¶È£¨Î»ÖÃ£©
@@ -212,18 +212,34 @@ void set_motor_pwm(MOTOR_TypeDef *motor){	//Êä³öpwm£¬´óÓÚ0Õı×ª£¬Ğ¡ÓÚ0·´×ª
 
 
 void limit_pwm_angle(MOTOR_TypeDef *motor){
-	if(motor->k_angle.integral <-((float)PWM_MAX/4.0f) )motor->k_angle.integral = -((float)PWM_MAX/4.0f);//ÏŞÖÆÎ»ÖÃÊ½pidÖĞµÄ»ı·ÖÏî¹ı´ó
-	if(motor->k_angle.integral > ((float)PWM_MAX/4.0f) )motor->k_angle.integral = ((float)PWM_MAX/4.0f);
+	if(motor->k_angle.integral <-(PWM_MAX/4) )motor->k_angle.integral = -(PWM_MAX/4);//ÏŞÖÆÎ»ÖÃÊ½pidÖĞµÄ»ı·ÖÏî¹ı´ó
+	if(motor->k_angle.integral > (PWM_MAX/4) )motor->k_angle.integral = (PWM_MAX/4);
 	
-	if(motor->pwm <-((float)PWM_MAX/2.0f) )motor->pwm = -((float)PWM_MAX/2.0f);
-	if(motor->pwm > ((float)PWM_MAX/2.0f) )motor->pwm = ((float)PWM_MAX/2.0f);
+	if(motor->pwm <-(PWM_MAX) )motor->pwm = -(PWM_MAX);
+	if(motor->pwm > (PWM_MAX) )motor->pwm = (PWM_MAX);
 }
 
-void limit_pwm_speed(MOTOR_TypeDef *motor){
-	if(motor->pwm <-((float)PWM_MAX/1.2f) )motor->pwm = -((float)PWM_MAX/1.2f) ;
-	if(motor->pwm > ((float)PWM_MAX/1.2f) )motor->pwm = ((float)PWM_MAX/1.2f);
+void limit_speed(MOTOR_TypeDef *motor){
+	if(motor->target_speed > SPEED_MAX)motor->target_speed = SPEED_MAX;
+	if(motor->target_speed < -SPEED_MAX)motor->target_speed = -SPEED_MAX;
 }
 
+void check_pwm_speed(MOTOR_TypeDef *motor){		// v = pwmÕ¼¿Õ±È * vmax
+	float f = (motor->k_speed.fi / PWM_MAX) * SPEED_MAX;
+	float v = motor->target_speed;
+	
+	if( -1.5f < f-v && f-v < 1.5f )return;		//Îó²îÔÚÔÊĞí·¶Î§ÄÚ
+	else motor->pwm = motor->k_speed.fi = ( v / SPEED_MAX ) * PWM_MAX; //Í¬Ê±¸Ä±äpwmºÍpidÀÛ¼ÓÏîfi
+}
+
+/*
+void feedback_angle(MOTOR_TypeDef *motor){
+	motor->actual_angle = get_angle(motor);													//»ñÈ¡Êµ¼Ê½Ç¶È
+	motor->pwm = (int)PID_position(motor->target_angle, motor->actual_angle, PWM_MAX, &motor->k_angle);	//pidËã³öĞèÒªÊä³öµÄpwm
+	limit_pwm(motor);
+	set_motor_pwm(motor);																	//·´À¡µç»ú
+}
+*/
 
 void feedback_angle(MOTOR_TypeDef *motor){
 	volatile float angle = get_angle(motor);	//»ñÈ¡Êµ¼Ê½Ç¶È
@@ -235,6 +251,15 @@ void feedback_angle(MOTOR_TypeDef *motor){
 	limit_pwm_angle(motor);
 	set_motor_pwm(motor);		//·´À¡µç»ú
 }
+
+/*
+void feedback_speed(MOTOR_TypeDef *motor){
+	motor->actual_speed = get_speed(0.01,motor); 		//printf("actual speed=%f\r\n",motor->actual_speed);														//»ñÈ¡Êµ¼ÊËÙ¶È
+	motor->pwm = (int)PID_incremental(motor->target_speed*jiansubi, motor->actual_speed*jiansubi,  PWM_MAX, &motor->k_speed); 	//pidËã³öĞèÒªÊä³öµÄpwm
+	//check_pwm_speed(&Back_L);																					//¼ì²épwmÖµÊÇ·ñÆ«Àë¹ı´ó
+	set_motor_pwm(motor);																					 	//·´À¡µç»ú
+}
+*/
 
 void feedback_speed(MOTOR_TypeDef *motor){
 	volatile float speed = get_speed(0.01,motor); 	//»ñÈ¡Êµ¼ÊËÙ¶È
@@ -258,6 +283,22 @@ void feedback_speed(MOTOR_TypeDef *motor){
 	set_motor_pwm(motor);		//·´À¡µç»ú
 }
 
+/*
+void feedback_angle_double(MOTOR_TypeDef *motor, float ms){ //Ë«»·pid£¬ÈÃµç»úÔÚÔÈËÙ×´Ì¬ÏÂ×ªµ½Ö¸¶¨½Ç¶È
+	motor->actual_angle = get_angle(motor);	
+	
+	motor->target_speed = PID_position(motor->target_angle, motor->actual_angle, SPEED_MAX*jiansubi, &motor->k_double)/jiansubi; //Î»ÖÃ»·pidËã³öĞèÒªµÄËÙ¶È
+	limit_speed(motor);
+	
+	motor->actual_speed = (float) (motor->capture_count - motor->last_count) / (beipin*xianshu*jiansubi*ms); //Êµ¼Ê×ªËÙ 
+	motor->last_count = motor->capture_count;
+	
+	motor->pwm = (int)PID_incremental(motor->target_speed*jiansubi, motor->actual_speed*jiansubi, PWM_MAX, &motor->k_speed); //ËÙ¶È»·pidËã³öÓ¦Êä³öµÄpwm
+		
+	limit_pwm(motor);
+	set_motor_pwm(motor);																	//·´À¡µç»ú
+}
+*/
 
 void feedback_angle_double(MOTOR_TypeDef *motor, float ms){ //Ë«»·pid£¬ÈÃµç»úÔÚÔÈËÙ×´Ì¬ÏÂ×ªµ½Ö¸¶¨½Ç¶È
 	motor->actual_angle = get_angle(motor);	
@@ -275,4 +316,3 @@ void feedback_angle_double(MOTOR_TypeDef *motor, float ms){ //Ë«»·pid£¬ÈÃµç»úÔÚÔ
 	limit_pwm_angle(motor);
 	set_motor_pwm(motor);	//·´À¡µç»ú
 }
-

@@ -38,6 +38,6 @@ void steer_start(STEER_TypeDef *steer){
 }
 
 void set_steer_pwm(STEER_TypeDef *steer){
-	int pwm = steer->A * steer->angle + steer->B;	//y = ax + b （pwm占空比与舵机转动角度成线性关系）
+	int pwm = steer->A * steer->angle + steer->B;
 	__HAL_TIM_SetCompare(&steer->timepwm,steer->channelpwm,pwm);
 }

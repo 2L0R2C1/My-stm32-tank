@@ -54,8 +54,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-int control_mode=0;	//速度控制模式为0，角度控制模式为1
-int ps2_mode=0;		//蓝牙控制模式为0，ps2控制模式为1
+int control_mode=0;
+int ps2_mode=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -154,21 +154,21 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-	HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);	//开启三个串口接收中断
+	HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
 	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
 	HAL_UART_Receive_IT(&huart3,(uint8_t *)&receiver3,1);
 	
 	control_mode = 0;
 	ps2_mode = 0;
-    MOTOR_Init(); 				//初始化底盘四个电机各参数（具体可转到motor.c文件查看）
-	MOTOR_Tim_Init(&Forward_L);	//开启控制电机的相应定时器（pwm、encoder、tim）
+    MOTOR_Init(); 
+	MOTOR_Tim_Init(&Forward_L);
 	MOTOR_Tim_Init(&Forward_R);
 	MOTOR_Tim_Init(&Back_L); 
 	MOTOR_Tim_Init(&Back_R); 
 	
-	steer_init();				//舵机初始化（开启pwm）
+	steer_init();
 	
-	printf("READY\r\n");		//向上位机发送初始化完成信号
+	printf("READY\r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -178,7 +178,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  set_steer_pwm(&Steer_f);	
+	  set_steer_pwm(&Steer_f);
 	  set_steer_pwm(&Steer_b);
 	  set_steer_pwm(&Turret);
 
@@ -190,7 +190,7 @@ int main(void)
 /**/
 	  
 	 if(ps2_mode){			//ps2手柄控制模式
-	  if( !PS2_RedLight()){ //手柄为绿灯模式
+//	  if( !PS2_RedLight()){ //手柄为绿灯模式
 		  
 		  delay_ms(50);	 //延时很重要不可去
 		  
@@ -198,7 +198,7 @@ int main(void)
 		  
 		  ps2_control( PS2_DataKey() );
 		  
-	  }else{				//手柄为红灯模式
+/*	  }else{				//手柄为红灯模式
 		  
 		  delay_ms(50);	 //延时很重要不可去
 		  
@@ -208,7 +208,7 @@ int main(void)
 		  ps2_angle();
 			
 	  }
-	}
+*/	}
   }
   /* USER CODE END 3 */
 }
@@ -278,14 +278,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 		HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
 	}
 	
-	if(huart ->Instance == USART2){		//串口二，与树莓派通信
+	if(huart ->Instance == USART2){	//串口二，与树莓派通信
 		
-		vision_control(receiver2);
+		HAL_UART_Transmit(&huart1,(uint8_t *)&receiver2,1,1);
+	//	vision_control(receiver2);
 		
 		HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
 	}
 	
-	if(huart ->Instance == USART3){		
+	if(huart ->Instance == USART3){
 //		printf("receiver3! %c",receiver3);
 //		HAL_UART_Transmit(&huart1,(u8 *)&receiver3,1,1);
 		HAL_UART_Receive_IT(&huart3,(uint8_t *)&receiver3,1);
@@ -321,13 +322,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){	//计数溢出更新中断
 	
 	
 	if(htim==(&htim6)){		
-		if(control_mode==1){ 			//control_mode=1 角度;control_mode=0 速度
-			feedback_angle(&Forward_L);	//反馈角度
+		if(control_mode==1){ 							//control_mode=1 角度;control_mode=0 速度
+			feedback_angle(&Forward_L);
 			feedback_angle(&Forward_R);
 			feedback_angle(&Back_L);
 			feedback_angle(&Back_R);
 		}else{
-			feedback_speed(&Forward_L); //反馈速度
+			feedback_speed(&Forward_L);
 			feedback_speed(&Forward_R);
 			feedback_speed(&Back_L);
 			feedback_speed(&Back_R);

@@ -21,30 +21,26 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
 Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
-D:\Documents\my-stm32-tank\Mars_Magnam\MDK-ARM\Mars.uvprojx
+D:\Documents\MCU Study\stm32\Project of stm32f407vet6\Mars_Rubber_5_14\MDK-ARM\Mars.uvprojx
 Project File Date:  05/07/2022
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'E:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Mars'
 compiling control.c...
-..\Hardware\control.c(91): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	float vx = 2.5 * (float)x / 128;	//x、y坐标映射为小车x、y方向分速度（最大2m/s）
-..\Hardware\control.c(92): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	float vy = 2.5 * (float)y / 128;
-..\Hardware\control.c(269): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	v_x = 1.2 * (float)dirx / 128;	//x、y坐标映射为小车x、y方向分速度（最大0.6m/s）
-..\Hardware\control.c(270): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	v_y = 1.2 * (float)diry / 128;
-..\Hardware\control.c(355): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	mul+=0.5;
-..\Hardware\control.c(361): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	mul-=0.5;
-..\Hardware\control.c: 6 warnings, 0 errors
+..\Hardware\control.c(322): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	Back_L.target_speed =  1.5*Forward_L.target_speed;
+..\Hardware\control.c(336): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	Back_L.target_speed =1.5*Forward_L.target_speed;
+..\Hardware\control.c(351): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	Back_R.target_speed =1.5*Forward_R.target_speed;
+..\Hardware\control.c(366): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	Back_L.target_speed = 1.5*Forward_L.target_speed;
+..\Hardware\control.c: 4 warnings, 0 errors
 linking...
-Program Size: Code=25440 RO-data=520 RW-data=124 ZI-data=4156  
+Program Size: Code=24660 RO-data=520 RW-data=96 ZI-data=4152  
 FromELF: creating hex file...
-"Mars\Mars.axf" - 0 Error(s), 6 Warning(s).
+"Mars\Mars.axf" - 0 Error(s), 4 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -68,7 +64,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.4.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:11
+Build Time Elapsed:  00:00:05
 </pre>
 </body>
 </html>

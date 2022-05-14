@@ -7,19 +7,20 @@
 volatile float x=0.0f,y=0.0f;
 
 
-float getdata(void){
-	volatile int num=0, t=0;
-	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE); 
-	HAL_UART_Receive_DMA(&huart2,rx2_buffer,4);
-//	HAL_UART_Receive(&huart2,rx2_buffer,4,4);
-	while(t<4){
-//	printf("%d",rx2_buffer[t]);
+int getdata(void){		//接收并转换树莓派数据
+	volatile int num=0, t=0, flag=1; 
+//	HAL_UART_Receive_DMA(&huart2,rx2_buffer,4);
+	HAL_UART_Receive(&huart2,rx2_buffer,4,4);
+	while(rx2_buffer[t]!='@'){
+		printf("%d",rx2_buffer[t]);
+		if(rx2_buffer[t]=='+')continue;
+		if(rx2_buffer[t]=='-')flag=-1;
 		num = num*10 + (rx2_buffer[t]-'0');
 		t++;
 	}
-//	printf("\r\n");
+	printf("\r\n");
 	HAL_UART_DMAStop(&huart2);
-	return (float)num/100.0f;
+	return flag*num;
 }
 
 
@@ -39,5 +40,5 @@ void vision_control(u8 order){
 		if(0<=Turret.angle+y&&Turret.angle+y<=50)Turret.angle += y;
 	}
 	
-//	printf("x=%f y=%f\r\n",x,y);
+	printf("x=%f y=%f\r\n",x,y);
 }

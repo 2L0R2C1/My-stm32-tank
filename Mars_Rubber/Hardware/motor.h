@@ -12,7 +12,7 @@ extern "C" {
 #define xianshu 13
 #define jiansubi 30
 #define PWM_MAX 7200
-#define SPEED_MAX 6
+#define SPEED_MAX 4
 
 #define CAPTURE htim6//定时中断获取电机状态
 
@@ -65,7 +65,7 @@ float get_angle(MOTOR_TypeDef *motor);	//测角度位置
 void set_motor_pwm(MOTOR_TypeDef *motor);	//pwm输出	
 
 void limit_pwm_angle(MOTOR_TypeDef *motor);		//限幅pwm
-void limit_pwm_speed(MOTOR_TypeDef *motor);		//限速
+void limit_speed(MOTOR_TypeDef *motor);		//限速
 void check_pwm_speed(MOTOR_TypeDef *motor);	//检查pid算出的pwm与目标速度关系是否近似对应
 void feedback_angle(MOTOR_TypeDef *motor);	//反馈角度信号给电机
 void feedback_speed(MOTOR_TypeDef *motor);  //反馈速度信号给电机

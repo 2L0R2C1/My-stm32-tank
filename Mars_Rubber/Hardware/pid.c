@@ -7,7 +7,7 @@ void PID_init(PID_TypeDef *k){					//初始化PID控制中的各项参数，避免积分项错误积
 	k->err_last1=0;	k->err_last2=0;	k->fi=0;
 }
 
-void set_pid(PID_TypeDef *k,float p,float i,float d){//设置p、i、d参数
+void set_pid(PID_TypeDef *k,float p,float i,float d){
 	PID_init(k);
 	k->p = p;	k->i = i;	k->d = d;
 }
