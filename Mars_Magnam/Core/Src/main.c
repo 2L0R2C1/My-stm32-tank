@@ -30,6 +30,7 @@
 #include "ps2.h"
 #include "delay.h"
 #include "motor.h"
+
 #include "steer.h"
 #include "vision.h"
 #include "control.h"
@@ -150,13 +151,17 @@ int main(void)
   MX_WWDG_Init();
   MX_USART2_UART_Init();
   MX_DMA_Init();
-  MX_TIM3_Init();
   MX_USART3_UART_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
 	HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
-	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
+//	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
 	HAL_UART_Receive_IT(&huart3,(uint8_t *)&receiver3,1);
+	
+//	HAL_UART_Receive_IT(&huart2,rx2_buffer,10);
+//	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+//	HAL_UART_Receive_DMA(&huart2,rx2_buffer,BUFFERSIZE);//打开DMA接收
 	
 	control_mode = 0;
 	ps2_mode = 0;
@@ -272,7 +277,6 @@ void SystemClock_Config(void)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	if(huart ->Instance == USART1){		//串口1
-		
 		bluetooth_control(receiver1);	//非ps2控制下用手机蓝牙控制小车
 		
 		HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
@@ -280,8 +284,21 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	
 	if(huart ->Instance == USART2){	//串口二，与树莓派通信
 		
-		HAL_UART_Transmit(&huart1,(uint8_t *)&receiver2,1,1);
-	//	vision_control(receiver2);
+/*	uint32_t tmp_flag = 0;
+		uint32_t temp;
+		if(__HAL_UART_GET_FLAG(&huart2,UART_FLAG_IDLE)!=RESET){
+			__HAL_UART_CLEAR_IDLEFLAG(&huart2);//清除标志位
+			HAL_UART_DMAStop(&huart2); //  停止DMA传输
+			temp  =  __HAL_DMA_GET_COUNTER(&hdma_usart2_rx);// 获取DMA中未传输的数据个数   
+			rx2_len =  BUFFERSIZE - temp; //总计数减去未传输的数据个数，得到已经接收的数据个数
+			
+			HAL_UART_Transmit(&huart1,rx2_buffer,rx2_len,0xff);
+//			memset(rx2_buffer,0,BUFFERSIZE);
+		}
+		HAL_UART_Receive_DMA(&huart2,rx2_buffer,BUFFERSIZE);//重新打开DMA接收
+*/		
+
+		vision_control(receiver2);
 		
 		HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
 	}

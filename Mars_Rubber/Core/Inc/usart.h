@@ -39,13 +39,21 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN Private defines */
+extern DMA_HandleTypeDef hdma_usart2_rx;
+extern DMA_HandleTypeDef hdma_usart2_tx;
+
+#define BUFFERSIZE 100
+
 extern volatile u8 receiver1;
 extern volatile u8 receiver2;
 extern volatile u8 receiver3;
 
-extern u8 rx1_buffer[10];
-extern u8 rx2_buffer[10];
-extern u8 rx3_buffer[10];
+extern u8 rx1_buffer[BUFFERSIZE];
+extern u8 rx2_buffer[BUFFERSIZE];
+extern u8 rx3_buffer[BUFFERSIZE];
+
+extern volatile u16 rx2_len;
+extern volatile u8 recv2_end_flag;
 
 /* USER CODE END Private defines */
 

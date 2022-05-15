@@ -496,6 +496,8 @@ void bluetooth_control(u8 order)
 			
 		case '!' : HAL_NVIC_SystemReset();	break;	//强制复位程序
 		
+		case '*' : HAL_UART_Transmit(&huart2,(uint8_t *)&receiver2,1,1); break;//视觉debug
+		
 		case '@' : {
 			printf("debug mode start\r\n");
 			printf("please select one motor\r\n");
