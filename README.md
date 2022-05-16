@@ -21,7 +21,7 @@
 
 ##### 硬件
 
-![frame](D:\Documents\my-stm32-tank\frame.png)
+![硬件架构](frame.png)
 
 双MCU控制，stm32f407vet6作底盘主控，stm32f411ceu6作炮台主控
 
@@ -41,9 +41,9 @@
 
 ##### Cubemx配置
 
-![cubemx-f407](D:\Documents\my-stm32-tank\cubemx-f407.png)
+![cubemx-f407](cubemx-f407.png)
 
-![cubemx-f411](D:\Documents\my-stm32-tank\cubemx-f411.png)
+![输入图片说明](cubemx-f411.png)
 
 这里关于定时器、编码器、pwm、usart怎么配置的可以看这篇[博客：【STM32】HAL库 STM32CubeMX系列学习教程](https://blog.csdn.net/as480133937/article/details/99935090)
 
@@ -401,8 +401,7 @@ while (1)
 ```
 
 ps2摇杆模拟量
-
-![ps2摇杆模拟量](D:\Documents\my-stm32-tank\ps2.jpg)
+![ps2摇杆模拟量](ps2.jpg)
 
 ```C
 void ps2_speed(void){		//正常前进模式
