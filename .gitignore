@@ -59,7 +59,9 @@ dkms.conf
 *.crf
 .mxproject
 
-MDK-ARM
-! MDK-ARM/F411_Turret.uvprojx
-
-Drivers
+MDK_ARM/Mars
+MDK_ARM/RTE
+MDK_ARM/DebugConfig
+MDK_ARM/*.21769
+MDK_ARM/*.86137
+MDK_ARM/uboptx
