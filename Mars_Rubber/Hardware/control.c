@@ -224,7 +224,7 @@ void ps2_control(u8 order){
 			MOTOR_reset(); 
 			receiver2 = '~';
 			HAL_UART_Transmit(&huart2,(uint8_t *)&receiver2,1,1);
-		//	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
+//			HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
 			break;
 		}
 		
@@ -246,8 +246,8 @@ void ps2_control(u8 order){
 
 
 const float SPEED =2;
-const float SPEED_UP =0.5;
-const float SPEED_DOWN =0.5;
+const float SPEED_UP =0.5f;
+const float SPEED_DOWN =0.5f;
 u8 order_last='Z';
 
 
@@ -295,16 +295,16 @@ void right(void)        //右转
 {
 	Forward_L.target_speed =0;
 	Forward_R.target_speed =0;
-	Back_L.target_speed = 1.5;
-	Back_R.target_speed = -1.5;
+	Back_L.target_speed = 1.5f;
+	Back_R.target_speed = -1.5f;
 	delay_ms(50);	
 }
 void left(void)         //左转
 {
 	Forward_L.target_speed =0;
 	Forward_R.target_speed =0;
-	Back_L.target_speed = -1.5;
-	Back_R.target_speed = 1.5 ;
+	Back_L.target_speed = -1.5f;
+	Back_R.target_speed = 1.5f;
 	delay_ms(50);
 }
 
@@ -319,7 +319,7 @@ void fright(void)       //前右
 		delay_ms(50);	
 	}
 	if(order_last=='B')return;
-	Back_L.target_speed =  1.5*Forward_L.target_speed;
+	Back_L.target_speed =  1.5f*Forward_L.target_speed;
 	delay_ms(50);	
 }
 void bright(void)       //后右
@@ -333,7 +333,7 @@ void bright(void)       //后右
 		delay_ms(50);
 	}
 	if(order_last=='D')return;
-	Back_L.target_speed =1.5*Forward_L.target_speed;
+	Back_L.target_speed =1.5f*Forward_L.target_speed;
 	//Back_R.target_speed = Forward_R.target_speed;
 	delay_ms(100);
 }
@@ -348,7 +348,7 @@ void fleft(void)        //前左
 		delay_ms(50);
 	}
 	if(order_last=='H')return;
-	Back_R.target_speed =1.5*Forward_R.target_speed;
+	Back_R.target_speed =1.5f*Forward_R.target_speed;
 	delay_ms(50);	
 }
 void bleft(void)        //后左
@@ -363,7 +363,7 @@ void bleft(void)        //后左
 	}
 	if(order_last=='F')return;
 	//Back_R.target_speed = 1.5*Forward_R.target_speed;
-	Back_L.target_speed = 1.5*Forward_L.target_speed;
+	Back_L.target_speed = 1.5f*Forward_L.target_speed;
 	delay_ms(50);
 }
 
@@ -409,19 +409,22 @@ void speed_down(void)   //减速
 	
 void Steer_f_up(void)  //升前爪
 {
-	Steer_f.angle = 0;
+	Steer_f.angle = 0;	set_steer_pwm(&Steer_f);
 }
 void Steer_f_down(void) //降前爪
 {
 	if(Steer_f.angle<80)Steer_f.angle +=10;
+	set_steer_pwm(&Steer_f);
 }
 void Steer_b_up(void)   //升后爪
 {
 	Steer_b.angle = 0;
+	set_steer_pwm(&Steer_b);
 }
 void Steer_b_down(void) //降后爪
 {
 	if(Steer_b.angle<80)Steer_b.angle += 10;
+	set_steer_pwm(&Steer_b);
 }
 
 void Turret_up(void)   //炮台上仰
@@ -565,15 +568,15 @@ void bluetooth_control(u8 order)
 			}
 			if(rx1_buffer[0]=='s'&&rx1_buffer[1]=='f'){	//前爪舵机
 				printf("input target angle\r\n");
-				scanf("%d",&Steer_f.angle);
+				scanf("%f",&Steer_f.angle);
 			}
 			if(rx1_buffer[0]=='s'&&rx1_buffer[1]=='b'){	//后爪舵机
 				printf("input target angle\r\n");
-				scanf("%d",&Steer_b.angle);
+				scanf("%f",&Steer_b.angle);
 			}
 			if(rx1_buffer[0]=='s'&&rx1_buffer[1]=='t'){	//云台俯仰舵机
 				printf("input target angle\r\n");
-				scanf("%d",&Turret.angle);
+				scanf("%f",&Turret.angle);
 			}			
 			break;
 		}

@@ -20,11 +20,11 @@ void steer_init(void){
 	Steer_b.max_angle = 180.0f;
 	Turret.max_angle = 270.0f;
 	
-	Steer_f.A = 25.0f/18.0f;
-	Steer_b.A = 25.0f/18.0f;
-	Turret.A = 20.0f/27.0f;
+	Steer_f.A = 250.0f/18.0f;
+	Steer_b.A = 250.0f/18.0f;
+	Turret.A = 200.0f/27.0f;
 	
-	Steer_f.B = Steer_b.B = Turret.B = 50.0f;
+	Steer_f.B = Steer_b.B = Turret.B = 500.0f;
 	
 	steer_start(&Steer_f);
 	steer_start(&Steer_b);
@@ -38,6 +38,14 @@ void steer_start(STEER_TypeDef *steer){
 }
 
 void set_steer_pwm(STEER_TypeDef *steer){
-	int pwm = steer->A * steer->angle + steer->B;
-	__HAL_TIM_SetCompare(&steer->timepwm,steer->channelpwm,pwm);
+	steer->pwm = steer->A * steer->angle + steer->B;
+	__HAL_TIM_SetCompare(&steer->timepwm,steer->channelpwm,steer->pwm);
 }
+
+void steer_turn_slow(STEER_TypeDef *steer){
+	int pwm = steer->A * steer->angle + steer->B;
+	if( steer->pwm > pwm ) steer->pwm --;
+	if( steer->pwm < pwm ) steer->pwm ++;
+	__HAL_TIM_SetCompare(&steer->timepwm,steer->channelpwm,steer->pwm);
+}
+

@@ -157,7 +157,7 @@ int main(void)
 
 	HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
 //	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
-	HAL_UART_Receive_IT(&huart3,(uint8_t *)&receiver3,1);
+//	HAL_UART_Receive_IT(&huart3,(uint8_t *)&receiver3,1);
 	
 //	HAL_UART_Receive_IT(&huart2,rx2_buffer,10);
 //	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
@@ -183,9 +183,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  set_steer_pwm(&Steer_f);
-	  set_steer_pwm(&Steer_b);
-	  set_steer_pwm(&Turret);
+//	  set_steer_pwm(&Steer_f);
+//	  set_steer_pwm(&Steer_b);
+	  steer_turn_slow(&Turret);
 
 //	  delay_ms(1000);
 //	  show_motor(&Forward_L);
@@ -194,26 +194,10 @@ int main(void)
 //	  show_motor(&Back_R);
 /**/
 	  
-	 if(ps2_mode){			//ps2手柄控制模式
-//	  if( !PS2_RedLight()){ //手柄为绿灯模式
-		  
+	 if(ps2_mode){	//ps2手柄控制模式
 		  delay_ms(50);	 //延时很重要不可去
-		  
-//		  if(control_mode)MOTOR_reset(),control_mode=0;
-		  
 		  ps2_control( PS2_DataKey() );
-		  
-/*	  }else{				//手柄为红灯模式
-		  
-		  delay_ms(50);	 //延时很重要不可去
-		  
-		  if(!control_mode)MOTOR_reset(),control_mode=1;
-		  
-	//	  ps2_control( PS2_DataKey() );
-		  ps2_angle();
-			
-	  }
-*/	}
+	 }
   }
   /* USER CODE END 3 */
 }
@@ -284,7 +268,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	
 	if(huart ->Instance == USART2){	//串口二，与树莓派通信
 		
-/*	uint32_t tmp_flag = 0;
+/*		uint32_t tmp_flag = 0;
 		uint32_t temp;
 		if(__HAL_UART_GET_FLAG(&huart2,UART_FLAG_IDLE)!=RESET){
 			__HAL_UART_CLEAR_IDLEFLAG(&huart2);//清除标志位

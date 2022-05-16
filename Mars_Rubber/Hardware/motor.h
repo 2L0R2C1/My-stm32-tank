@@ -36,8 +36,7 @@ typedef struct
 	
 	TIM_HandleTypeDef timepwm1; //电机in1 pwm对应定时器
 	u16 channelpwm1;			//电机in1对应pwm输入通道
-	
-	
+
 	TIM_HandleTypeDef timepwm2; //电机in2 pwm对应定时器
 	u16 channelpwm2;			//电机in2对应pwm输入通道
 	

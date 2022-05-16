@@ -88,9 +88,9 @@ void ps2_speed(void){		//正常前进模式
 //	printf("v = %f\r\n w = %f\r\n",v,w);
 */	
 
-	float vx = 2.5 * (float)x / 128;	//x、y坐标映射为小车x、y方向分速度（最大2m/s）
-	float vy = 2.5 * (float)y / 128;
-	float ww = 4 * (float)w / 128;		//w坐标映射为小车转速（最大3rad/s）
+	float vx = 2.5f * (float)x / 128;	//x、y坐标映射为小车x、y方向分速度（最大2m/s）
+	float vy = 2.5f * (float)y / 128;
+	float ww = 4.0f * (float)w / 128;		//w坐标映射为小车转速（最大3rad/s）
 	z = 5*(float)z/128.0f;
 	
 	Forward_R.target_speed = vy - vx - ww*(a+b);
@@ -266,9 +266,9 @@ void stop(void)         //停止
 void direction_change(void)
 {
 
-	v_x = 1.2 * (float)dirx / 128;	//x、y坐标映射为小车x、y方向分速度（最大0.6m/s）
-	v_y = 1.2 * (float)diry / 128;
-  w_w = 3 * (float)dirw / 128;		//w坐标映射为小车转速（最大6rad/s）
+	v_x = 1.2f * (float)dirx / 128;	//x、y坐标映射为小车x、y方向分速度（最大0.6m/s）
+	v_y = 1.2f * (float)diry / 128;
+    w_w = 3.0f * (float)dirw / 128;		//w坐标映射为小车转速（最大6rad/s）
 	Forward_R.target_speed = mul*(v_y - v_x) + w_w*(a+b);
 	Forward_L.target_speed = mul*(v_y + v_x) - w_w*(a+b);
 	Back_L.target_speed = mul*(v_y - v_x) - w_w*(a+b);
@@ -352,13 +352,13 @@ void bleft(void)        //后左
 
 void speed_up(void)     //加速
 {
-	mul+=0.5;
+	mul+=0.5f;
 }
 	
 void speed_down(void)   //减速
 {
 	if(mul==0)return;
-	mul-=0.5;
+	mul-=0.5f;
 }
 
 void turn_left(void)    //左旋
@@ -381,19 +381,22 @@ void turn_right(void)   //右旋
 	
 void Steer_f_up(void)  //升前爪
 {
-	Steer_f.angle = 0;
+	Steer_f.angle = 0; set_steer_pwm(&Steer_f);
 }
 void Steer_f_down(void) //降前爪
 {
 	if(Steer_f.angle<80)Steer_f.angle +=10;
+	set_steer_pwm(&Steer_f);
 }
 void Steer_b_up(void)   //升后爪
 {
 	Steer_b.angle = 0;
+	set_steer_pwm(&Steer_f);
 }
 void Steer_b_down(void) //降后爪
 {
 	if(Steer_b.angle<80)Steer_b.angle += 10;
+	set_steer_pwm(&Steer_f);
 }
 
 void Turret_up(void)   //炮台上仰
@@ -535,15 +538,15 @@ void bluetooth_control(u8 order)
 			}
 			if(rx1_buffer[0]=='s'&&rx1_buffer[1]=='f'){	//前爪舵机
 				printf("input target angle\r\n");
-				scanf("%d",&Steer_f.angle);
+				scanf("%f",&Steer_f.angle);
 			}
 			if(rx1_buffer[0]=='s'&&rx1_buffer[1]=='b'){	//后爪舵机
 				printf("input target angle\r\n");
-				scanf("%d",&Steer_b.angle);
+				scanf("%f",&Steer_b.angle);
 			}
 			if(rx1_buffer[0]=='s'&&rx1_buffer[1]=='t'){	//云台俯仰舵机
 				printf("input target angle\r\n");
-				scanf("%d",&Turret.angle);
+				scanf("%f",&Turret.angle);
 			}			
 			break;
 		}
