@@ -154,6 +154,8 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+	
+	steer_init();
 
 	HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
 //	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
@@ -165,15 +167,16 @@ int main(void)
 	
 	control_mode = 0;
 	ps2_mode = 0;
-    MOTOR_Init(); 
+  MOTOR_Init(); 
 	MOTOR_Tim_Init(&Forward_L);
 	MOTOR_Tim_Init(&Forward_R);
 	MOTOR_Tim_Init(&Back_L); 
 	MOTOR_Tim_Init(&Back_R); 
 	
-	steer_init();
+	
 	
 	printf("READY\r\n");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -183,8 +186,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  set_steer_pwm(&Steer_f);
-//	  set_steer_pwm(&Steer_b);
+	//  set_steer_pwm(&Steer_f);
+	 // set_steer_pwm(&Steer_b);
 	  steer_turn_slow(&Turret);
 
 //	  delay_ms(1000);

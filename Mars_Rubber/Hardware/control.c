@@ -413,7 +413,7 @@ void Steer_f_up(void)  //ÉýÇ°×¦
 }
 void Steer_f_down(void) //½µÇ°×¦
 {
-	if(Steer_f.angle<80)Steer_f.angle +=10;
+	if(Steer_f.angle<120)Steer_f.angle +=10;
 	set_steer_pwm(&Steer_f);
 }
 void Steer_b_up(void)   //Éýºó×¦
@@ -423,7 +423,7 @@ void Steer_b_up(void)   //Éýºó×¦
 }
 void Steer_b_down(void) //½µºó×¦
 {
-	if(Steer_b.angle<80)Steer_b.angle += 10;
+	if(Steer_b.angle<130)Steer_b.angle += 10;
 	set_steer_pwm(&Steer_b);
 }
 
