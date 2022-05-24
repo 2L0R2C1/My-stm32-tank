@@ -1,5 +1,6 @@
 #include "steer.h"
 #include "tim.h"
+#include "delay.h"
 #include "usart.h"
 
 STEER_TypeDef Steer_f={0},Steer_b={0},Turret;
@@ -14,7 +15,7 @@ void steer_init(void){
 	
 	Steer_f.angle = 0;
 	Steer_b.angle = 0;
-	Turret.angle = 0;
+	Turret.angle = 10;
 	
 	Steer_f.max_angle = 180.0f;
 	Steer_b.max_angle = 180.0f;
@@ -34,20 +35,18 @@ void steer_init(void){
 
 void steer_start(STEER_TypeDef *steer){
 	HAL_TIM_PWM_Start(&steer->timepwm,steer->channelpwm);
-	steer->angle = 0;
 	set_steer_pwm(steer);
 }
 
 void set_steer_pwm(STEER_TypeDef *steer){
 	steer->pwm = steer->A * steer->angle + steer->B;
-	printf("%d\r\n",steer->pwm);
 	__HAL_TIM_SetCompare(&steer->timepwm,steer->channelpwm,steer->pwm);
 }
 
 void steer_turn_slow(STEER_TypeDef *steer){
 	int pwm = steer->A * steer->angle + steer->B;
-	if( steer->pwm > pwm ) steer->pwm --;
-	if( steer->pwm < pwm ) steer->pwm ++;
+	if( steer->pwm > pwm ) steer->pwm -- , delay_ms(3);
+	if( steer->pwm < pwm ) steer->pwm ++ , delay_ms(3);
 	__HAL_TIM_SetCompare(&steer->timepwm,steer->channelpwm,steer->pwm);
 }
 

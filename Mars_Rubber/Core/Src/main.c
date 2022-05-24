@@ -158,7 +158,7 @@ int main(void)
 	steer_init();
 
 	HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
-//	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
+	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
 //	HAL_UART_Receive_IT(&huart3,(uint8_t *)&receiver3,1);
 	
 //	HAL_UART_Receive_IT(&huart2,rx2_buffer,10);
@@ -188,8 +188,10 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	//  set_steer_pwm(&Steer_f);
 	 // set_steer_pwm(&Steer_b);
-	  steer_turn_slow(&Turret);
+//	  set_steer_pwm(&Turret);
+	  steer_turn_slow(&Turret); 	
 
+//	  printf("turret angle %f\r\n",Turret.angle);
 //	  delay_ms(1000);
 //	  show_motor(&Forward_L);
 //	  show_motor(&Forward_R);

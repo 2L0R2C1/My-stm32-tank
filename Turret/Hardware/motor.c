@@ -109,9 +109,9 @@ float get_angle(MOTOR_TypeDef *motor){		//测角度（位置）
 	float angle=0;
 
 	motor->capture_count = __HAL_TIM_GetCounter(&motor->encoder) + (motor->encoder_overflow*0xffff);	//当前捕获值 = 捕获计数器的值 + 溢出次数*捕获计数器最大装载值
-
+//	printf("capture=%d\r\n",motor->capture_count);
 	angle = 360.0f * (float)motor->capture_count/(beipin*xianshu*jiansubi);		//实际角度 = 360度 * 捕获脉冲数 / （倍频数*线数*减速比）
-	
+//	printf("angle=%f\r\n",angle);
 	return angle;			
 }
 
@@ -193,7 +193,7 @@ void feedback_speed(MOTOR_TypeDef *motor){
 }
 
 void feedback_angle_double(MOTOR_TypeDef *motor){ //双环pid，让电机在匀速状态下转到指定角度
-	motor->actual_angle = get_angle(motor);	
+	motor->actual_angle = get_angle(motor);		
 	
 	motor->target_speed = PID_position(motor->target_angle, motor->actual_angle, SPEED_MAX*jiansubi, &motor->k_double)/jiansubi; //位置环pid算出需要的速度
 	limit_speed(&Bopan);

@@ -62,28 +62,33 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Friction1_Pin GPIO_PIN_0
+#define Friction1_GPIO_Port GPIOA
+#define Friction2_Pin GPIO_PIN_1
+#define Friction2_GPIO_Port GPIOA
 #define Bopan_IN1_Pin GPIO_PIN_2
 #define Bopan_IN1_GPIO_Port GPIOA
 #define Bopan_IN2_Pin GPIO_PIN_3
 #define Bopan_IN2_GPIO_Port GPIOA
-#define ENA_Pin GPIO_PIN_4
-#define ENA_GPIO_Port GPIOA
-#define IN1_Pin GPIO_PIN_5
+#define IN1_Pin GPIO_PIN_4
 #define IN1_GPIO_Port GPIOA
-#define IN2_Pin GPIO_PIN_6
+#define IN2_Pin GPIO_PIN_5
 #define IN2_GPIO_Port GPIOA
-#define IN3_Pin GPIO_PIN_7
+#define IN3_Pin GPIO_PIN_6
 #define IN3_GPIO_Port GPIOA
-#define IN4_Pin GPIO_PIN_0
-#define IN4_GPIO_Port GPIOB
-#define ENB_Pin GPIO_PIN_1
-#define ENB_GPIO_Port GPIOB
+#define IN4_Pin GPIO_PIN_7
+#define IN4_GPIO_Port GPIOA
+#define FrictionL_Pin GPIO_PIN_0
+#define FrictionL_GPIO_Port GPIOB
+#define FrictionR_Pin GPIO_PIN_1
+#define FrictionR_GPIO_Port GPIOB
 #define Bopan_A_Pin GPIO_PIN_8
 #define Bopan_A_GPIO_Port GPIOA
 #define Bopan_B_Pin GPIO_PIN_9
 #define Bopan_B_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
-
+#define A2312
+//#define L298N
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

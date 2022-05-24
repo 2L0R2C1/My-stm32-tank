@@ -81,9 +81,9 @@ void show_motor(MOTOR_TypeDef *motor){
 	printf("err_last2: %f\r\n",motor->k_speed.err_last2);
 	printf("Motor fi: %f\r\n",motor->k_speed.fi);
 	
-	printf("capture_count: %d\r\n",motor->capture_count);
+*/	printf("capture_count: %d\r\n",motor->capture_count);
 	printf("last_count: %d\r\n",motor->last_count);
-*/	printf("pwm: %d\r\n",motor->pwm);
+	printf("pwm: %d\r\n",motor->pwm);
 /*	printf("motor encoder_overflow: %d\r\n",motor->encoder_overflow);
 	
 	printf("kp: %f\r\n",motor->k_angle.p);
@@ -100,7 +100,7 @@ void show_motor(MOTOR_TypeDef *motor){
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int pwm =0;
 /* USER CODE END 0 */
 
 /**
@@ -136,15 +136,14 @@ int main(void)
   MX_TIM10_Init();
   MX_USART6_UART_Init();
   MX_USART1_UART_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
 	MOTOR_Init(); 
+	friction_init();
 	
-//	set_pid(&Bopan.k_double,1.2,0.002,25);
-	
-	MOTOR_Tim_Init(&Bopan);	
-//	MOTOR_Tim_Init(&Friction_L);	
-//	MOTOR_Tim_Init(&Friction_R);	
+	MOTOR_Tim_Init(&Bopan);		
 	
 //	Bopan.target_speed = 0.5; Bopan.mode = 0;
 	
@@ -152,6 +151,8 @@ int main(void)
 	
 	HAL_UART_Receive_IT(&huart6,(uint8_t *)&receiver6,1);
 	HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
+	
+	printf("Ready");
 	
   /* USER CODE END 2 */
 
@@ -217,7 +218,10 @@ void SystemClock_Config(void)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	if(huart->Instance == USART1){  
 //		HAL_UART_Transmit(&huart1,(uint8_t *)&receiver1,1,1);
-//		HAL_UART_Transmit(&huart6,(uint8_t *)&receiver1,1,1);		
+//		HAL_UART_Transmit(&huart6,(uint8_t *)&receiver1,1,1);
+		if(receiver1 == '1')	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_1,200),__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200),printf("1\r\n");
+		if(receiver1 == '2')	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_1,100),__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,100),printf("2\r\n");
+		if(receiver1 == '4') 	scanf("%d",&pwm), printf("OK\r\n");
 		HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
 	}
 	if(huart->Instance == USART6){

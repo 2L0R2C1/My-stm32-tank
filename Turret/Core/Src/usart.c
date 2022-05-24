@@ -196,11 +196,11 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 /********************重定向printf, scanf函数到串口********************/
 int fgetc(FILE *f){
 	int ch = 0;
-	HAL_UART_Receive(&huart6,(uint8_t *)&ch,1,0xffff);
+	HAL_UART_Receive(&huart1,(uint8_t *)&ch,1,0xffff);
 	return ch;
 }
 int fputc(int ch, FILE *f){
-	HAL_UART_Transmit(&huart6,(uint8_t *)&ch,1,0xffff);
+	HAL_UART_Transmit(&huart1,(uint8_t *)&ch,1,0xffff);
 	return ch;
 }
 /********************重定向printf, scanf函数到串口********************/

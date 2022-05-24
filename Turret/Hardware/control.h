@@ -5,6 +5,7 @@
 #define Buff_Max 10 
 extern u8 num;
 extern u8 RxBuff[Buff_Max];
+void friction_init(void);
 void friction_start(void);
 void friction_stop(void);
 void single_shot(void);			//µ¥·¢

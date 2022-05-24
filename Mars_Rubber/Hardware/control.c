@@ -121,8 +121,9 @@ void ps2_control(u8 order){
 		
 		case PSB_PAD_DOWN : {	//前爪降，后爪归位
 			while(PS2_DataKey()==PSB_PAD_DOWN&&t<3)t++,delay_ms(50);
-			if(Steer_f.angle < 80){
-				Steer_f.angle += 10, Steer_b.angle = 0; 
+			if(Steer_f.angle < 110){
+				//Steer_f.angle += 10, Steer_b.angle = 0; 
+				Steer_f.angle = 110; Steer_b.angle = 0;
 				set_steer_pwm(&Steer_f);
 				set_steer_pwm(&Steer_b);
 			}
@@ -131,8 +132,9 @@ void ps2_control(u8 order){
 		
 		case PSB_PAD_UP : {		//后爪降，前爪归位
 			while(PS2_DataKey()==PSB_PAD_UP&&t<3)t++,delay_ms(50);
-			if(Steer_b.angle < 80){
-				Steer_f.angle = 0, Steer_b.angle += 10;
+			if(Steer_b.angle < 130){
+				//Steer_f.angle = 0, Steer_b.angle += 10;
+				Steer_f.angle = 0; Steer_b.angle = 130;
 				set_steer_pwm(&Steer_f);
 				set_steer_pwm(&Steer_b);
 			}
@@ -413,8 +415,10 @@ void Steer_f_up(void)  //升前爪
 }
 void Steer_f_down(void) //降前爪
 {
-	if(Steer_f.angle<120)Steer_f.angle +=10;
+//	if(Steer_f.angle<110)Steer_f.angle +=10;
+	Steer_f.angle = 110; 
 	set_steer_pwm(&Steer_f);
+	Steer_b_up();
 }
 void Steer_b_up(void)   //升后爪
 {
@@ -423,8 +427,10 @@ void Steer_b_up(void)   //升后爪
 }
 void Steer_b_down(void) //降后爪
 {
-	if(Steer_b.angle<130)Steer_b.angle += 10;
+//	if(Steer_b.angle<130)Steer_b.angle += 10;
+	Steer_b.angle = 130; 
 	set_steer_pwm(&Steer_b);
+	Steer_f_up();
 }
 
 void Turret_up(void)   //炮台上仰
