@@ -3,8 +3,8 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'F411_Turret' 
- * Target:  'F411_Turret' 
+ * Project: 'F103_Turret' 
+ * Target:  'F103_Turret' 
  */
 
 #ifndef RTE_COMPONENTS_H
@@ -14,7 +14,7 @@
 /*
  * Define the Device Header File: 
  */
-#define CMSIS_device_header "stm32f4xx.h"
+#define CMSIS_device_header "stm32f10x.h"
 
 
 #endif /* RTE_COMPONENTS_H */
