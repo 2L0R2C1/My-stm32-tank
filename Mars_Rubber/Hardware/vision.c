@@ -5,7 +5,7 @@
 #include "Steer.h"
 
 float x=0,y=0; 
-const int m=10;
+const int m=20;
 float xp[50],yp[50];
 float xx=0.0f,yy=0.0f;
 
@@ -29,23 +29,25 @@ void vision_control(u8 order){
 	if(order=='N')x=0,y=0,printf("{#no target}$\r\n");
 	if(order=='V')printf("{#lock target}$\r\n");
 	
-//	if(x>-60&&x<60)xp[t] = x; else xp[t]=0;		//过滤过大值
-//	if(y>-15&&y<15)yp[t] = y; else yp[t]=0;
+//	printf("{#x=%f y=%f}$\r\n",x,y);
 	
-	
-//	xx=0.0f,yy=0.0f;
-//	while(q<m)xx += xp[q], yy += yp[q], q++;	//均值处理，使移动平滑
-//	xx = xx*70/(float)m; yy = yy/(float)m;
-	printf("{#x=%f y=%f}$\r\n",x,y);
-	
-	if(x<-60)x=-60;if(x>60)x=60;
+	if(x<-30)x=0; if(x>30)x=0;	//过滤过大值
+	if(x<-10)x=-10;if(x>10)x=10;		
+	if(y<-20)y=0; if(y>20)y=0;
 	if(y<-5)y=-5;if(y>5)y=5;
-	xx=x*70; yy=y;	
 	
+	xp[t]=x; yp[t]=y;
+	
+	xx=0.0f,yy=0.0f;
+	while(q<m)xx += xp[q], yy += yp[q], q++;	//均值处理，使移动平滑
+	xx = xx*3/(float)m; yy = yy/(float)m;
 
-	Forward_L.target_angle += xx;
-	Forward_R.target_angle += xx;
-	Back_L.target_angle += xx,	
+//	printf("{#xx=%f yy=%f}$\r\n",xx,yy);
+//	xx=x*70; yy=y;	
+	
+//	Forward_L.target_angle += xx;
+//	Forward_R.target_angle += xx;
+	Back_L.target_angle -= xx,	
 	Back_R.target_angle += xx;
 	if(10<Turret.angle+yy&&Turret.angle+yy<=50)Turret.angle += yy;
 }
