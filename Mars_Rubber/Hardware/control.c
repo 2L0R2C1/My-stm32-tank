@@ -21,12 +21,16 @@ u8 i=0, n=15;			//n与速度挡位有关
 
 
 void ps2_angle(void){		//调方向模式，打靶
+//	printf("{# %5d %5d %5d %5d }$\r\n",PS2_AnologData(PSS_LX),PS2_AnologData(PSS_LY),
+//		                              PS2_AnologData(PSS_RX),PS2_AnologData(PSS_RY) );
 	
-	i8 x = PS2_AnologData(PSS_LX) - 128; //摇杆x、y轴坐标
-	i8 y = PS2_AnologData(PSS_LY) - 127; 
+	i16 x = PS2_AnologData(PSS_LX) - 128; //摇杆x、y轴坐标
+	i16 y = PS2_AnologData(PSS_LY) ; 
 	
 	float xx = 70*(float)x/128.0f;
-	float yy = 5*(float)y/128.0f;
+	float yy = 0.0f;
+	
+	if(y<80)yy=-2; if(y>160)yy=2;
 	
 	Forward_L.target_angle += xx;
 	Forward_R.target_angle -= xx;
@@ -63,13 +67,13 @@ void ps2_angle(void){		//调方向模式，打靶
 
 
 void ps2_speed(void){		//正常前进模式
-//	printf(" %5d %5d %5d %5d\r\n",PS2_AnologData(PSS_LX),PS2_AnologData(PSS_LY),
+//	printf("{# %5d %5d %5d %5d }$\r\n",PS2_AnologData(PSS_LX),PS2_AnologData(PSS_LY),
 //		                              PS2_AnologData(PSS_RX),PS2_AnologData(PSS_RY) );
 	
-	i8 x = PS2_AnologData(PSS_RX) - 128; //摇杆x、y轴坐标
-	i8 y = 127 - PS2_AnologData(PSS_RY);
+	i16 x = PS2_AnologData(PSS_RX) - 128; //摇杆x、y轴坐标
+	i16 y = 127 - PS2_AnologData(PSS_RY);
 	
-	i8 z = PS2_AnologData(PSS_LY) - 127; 
+	i16 z = PS2_AnologData(PSS_LY) ; 
 
 
 /*	n = geer*5	; //if(n==5)n=2;
@@ -87,7 +91,7 @@ void ps2_speed(void){		//正常前进模式
 */	
 	v = geer*(float)y/128.0f;	//摇杆y坐标映射为小车前进速度，速度范围-geer ~ geer
 	w = (geer/3)*(float)x/128.0f; //摇杆x坐标映射为小车转弯量
-	z = 5*(float)z/128.0f;
+	if(z<80)z=-2; else if(z>160)z=2; else z=0;
 	
 	if(v>=0){
 		Forward_L.target_speed = v+w;	
@@ -108,19 +112,17 @@ void ps2_speed(void){		//正常前进模式
 
 void ps2_control(u8 order){
 	u8 t=0;
-	
-	if(control_mode)ps2_angle();
-	else ps2_speed();
+	if(!order)return;
 	
 	switch(order){
 		
 		case PSB_START : {	//reset
-			while(PS2_DataKey()==PSB_START)delay_ms(50);//等待按键松开，限制按下并松开为一次有效按键
+			while(PS2_DataKey()==PSB_START)delay_ms(10);//等待按键松开，限制按下并松开为一次有效按键
 			HAL_NVIC_SystemReset();	//强制复位程序
 		}
 		
-		case PSB_PAD_DOWN : {	//前爪降，后爪归位
-			while(PS2_DataKey()==PSB_PAD_DOWN&&t<3)t++,delay_ms(50);
+		case PSB_PAD_UP : {	//前爪降，后爪归位
+//			while(PS2_DataKey()==PSB_PAD_UP&&t<3)t++,delay_ms(10);
 			if(Steer_f.angle < 110){
 				//Steer_f.angle += 10, Steer_b.angle = 0; 
 				Steer_f.angle = 110; Steer_b.angle = 0;
@@ -130,8 +132,8 @@ void ps2_control(u8 order){
 			break;
 		}
 		
-		case PSB_PAD_UP : {		//后爪降，前爪归位
-			while(PS2_DataKey()==PSB_PAD_UP&&t<3)t++,delay_ms(50);
+		case PSB_PAD_DOWN : {		//后爪降，前爪归位
+//			while(PS2_DataKey()==PSB_PAD_DOWN&&t<3)t++,delay_ms(10);
 			if(Steer_b.angle < 130){
 				//Steer_f.angle = 0, Steer_b.angle += 10;
 				Steer_f.angle = 0; Steer_b.angle = 130;
@@ -142,14 +144,14 @@ void ps2_control(u8 order){
 		}
 		
 		case PSB_PAD_LEFT : {	//前后爪归位
-			while(PS2_DataKey()==PSB_PAD_LEFT&&t<3)t++,delay_ms(50);
+//			while(PS2_DataKey()==PSB_PAD_LEFT&&t<3)t++,delay_ms(10);
 			Steer_f.angle = 0, Steer_b.angle = 0;
 			set_steer_pwm(&Steer_f);
 			set_steer_pwm(&Steer_b);
 		}
 		
 		case PSB_PAD_RIGHT : {	//全自动爬梯
-			while(PS2_DataKey()==PSB_PAD_RIGHT)delay_ms(50);//等待按键松开，限制按下并松开为一次有效按键
+//			while(PS2_DataKey()==PSB_PAD_RIGHT&&t<3)t++,delay_ms(10);//等待按键松开，限制按下并松开为一次有效按键
 			
 			MOTOR_reset(),control_mode=1;	delay_ms(500);
 			
@@ -171,7 +173,7 @@ void ps2_control(u8 order){
 		}
 		
 		case PSB_L1 : {		//加档，小车速度挡+1
-			while(PS2_DataKey()==PSB_L1)delay_ms(50);	//等待按键松开，限制按一次加一档
+//			while(PS2_DataKey()==PSB_L1&&t<3)t++,delay_ms(10);	//等待按键松开，限制按一次加一档
 			if(geer<4){
 				geer+=1;	
 	//			for(i=n;i>0;i--)V[i]=W[i]=0;
@@ -179,7 +181,7 @@ void ps2_control(u8 order){
 			break;
 		}
 		case PSB_L2 : {		//减档，小车速度挡-1
-			while(PS2_DataKey()==PSB_L2)delay_ms(50);	//等待按键松开，限制按一次加一档
+//			while(PS2_DataKey()==PSB_L2&&t<3)t++,delay_ms(10);	//等待按键松开，限制按一次加一档
 			if(geer>1){
 				geer-=1;	
 	//			for(i=n;i>0;i--)V[i]=W[i]=0;
@@ -188,20 +190,20 @@ void ps2_control(u8 order){
 		}
 		
 		case PSB_R1 : {		//给炮台主控单片机发送 单发一颗子弹 的指令
-			while(PS2_DataKey()==PSB_R1)delay_ms(50);	//等待按键松开，限制按一次发一颗子弹
+//			while(PS2_DataKey()==PSB_R1&&t<3)t++,delay_ms(10);	//等待按键松开，限制按一次发一颗子弹
 			receiver3 = 'o';
 			HAL_UART_Transmit(&huart3,(u8 *)&receiver3,1,1);
 			break;
 		}
 		case PSB_R2 : {		//给炮台主控单片机发送 连发五颗子弹 的指令
-			while(PS2_DataKey()==PSB_R2)delay_ms(50);	//等待按键松开，限制按一次发五颗子弹
+//			while(PS2_DataKey()==PSB_R2&&t<3)t++,delay_ms(10);	//等待按键松开，限制按一次发五颗子弹
 			receiver3 = 'w';
 			HAL_UART_Transmit(&huart3,(u8 *)&receiver3,1,1);
 			break;
 		}
 		
 		case PSB_PINK : {	//向树莓派发送“符文模式”指令
-			while(PS2_DataKey()==PSB_PINK)delay_ms(50);
+//			while(PS2_DataKey()==PSB_PINK&&t<3)t++,delay_ms(10);
 			MOTOR_reset();
 			receiver2 = '%';
 			HAL_UART_Transmit(&huart2,(uint8_t *)&receiver2,1,1);
@@ -211,7 +213,7 @@ void ps2_control(u8 order){
 		}
 			
 		case PSB_GREEN : {	//向树莓派发送“打靶模式”指令
-			while(PS2_DataKey()==PSB_GREEN)delay_ms(50);
+//			while(PS2_DataKey()==PSB_GREEN&&t<3)t++,delay_ms(10);
 			control_mode=1;
 			MOTOR_reset();
 			receiver2 = '&';
@@ -221,7 +223,7 @@ void ps2_control(u8 order){
 		}
 		
 		case PSB_BLUE : {	//向树莓派发送“机动模式”指令
-			while(PS2_DataKey()==PSB_BLUE)delay_ms(50);
+//			while(PS2_DataKey()==PSB_BLUE&&t<3)t++,delay_ms(10);
 			control_mode=0;
 			MOTOR_reset(); 
 			receiver2 = '~';
@@ -231,7 +233,7 @@ void ps2_control(u8 order){
 		}
 		
 		case PSB_RED : {	//停下摩擦轮电机
-			while(PS2_DataKey()==PSB_RED)delay_ms(50); 
+//			while(PS2_DataKey()==PSB_RED&&t<3)t++,delay_ms(10); 
 			receiver3 = 'n';
 			HAL_UART_Transmit(&huart3,(u8 *)&receiver3,1,1);
 			break;
@@ -259,7 +261,7 @@ void stop(void)         //停止
 	Forward_R.target_speed=0;
 	Back_L.target_speed=0;
 	Back_R.target_speed=0;
-	delay_ms(100);	
+	delay_ms(50);	
 }
 
 void forward(void)      //前进
@@ -269,13 +271,13 @@ void forward(void)      //前进
   {
 	  Back_L.target_speed = Forward_L.target_speed;
 	  Back_R.target_speed = Forward_R.target_speed;
-		delay_ms(100);	return;
+		delay_ms(50);	return;
 	}
 	Forward_L.target_speed = SPEED;
 	Forward_R.target_speed = SPEED;
 	Back_L.target_speed = SPEED;
 	Back_R.target_speed = SPEED;
-	delay_ms(100);	
+	delay_ms(50);	
 }
 void back(void)         //后退
 {
@@ -284,13 +286,13 @@ void back(void)         //后退
   {
 	  Back_L.target_speed = Forward_L.target_speed;
 	  Back_R.target_speed = Forward_R.target_speed;
-		delay_ms(100);	return;
+		delay_ms(50);	return;
 	}
 	Forward_L.target_speed = -SPEED;
 	Forward_R.target_speed = -SPEED;
 	Back_L.target_speed = -SPEED;
 	Back_R.target_speed = -SPEED;
-	delay_ms(100);	
+	delay_ms(50);	
 }
 
 void right(void)        //右转
@@ -337,7 +339,7 @@ void bright(void)       //后右
 	if(order_last=='D')return;
 	Back_L.target_speed =1.5f*Forward_L.target_speed;
 	//Back_R.target_speed = Forward_R.target_speed;
-	delay_ms(100);
+	delay_ms(50);
 }
 void fleft(void)        //前左
 {
@@ -448,7 +450,7 @@ void bluetooth_control(u8 order)
 		case 'A':	forward(); 	break;	//正前		        
 		case 'B':	fright();  	break;	//前右 									        
 		case 'C':	right();   	break;	//向右				        	        
-		case 'D': bright();  	break;	//后右            				        
+		case 'D': 	bright();  	break;	//后右            				        
 		case 'E':	back();    	break;  //正后            				        
 		case 'F':	bleft();  	break;  //后左            				        
 		case 'G':	left();    	break;  //向左            				        
@@ -474,8 +476,18 @@ void bluetooth_control(u8 order)
 		case 'w': HAL_UART_Transmit(&huart3,(u8*)&order,1,1);break;
 		case 'k': HAL_UART_Transmit(&huart3,(u8*)&order,1,1);break;
 			
-		case '#': ps2_mode = 1;	printf("turn to ps2\r\n"); break;//改蓝牙控制为ps2手柄控制
-		case '$': ps2_mode = 0;	printf("turn to bluetooth\r\n");	break;								 //改ps2控制为蓝牙控制
+		case '#': {
+			MOTOR_reset();
+			ps2_mode = 1; control_mode = 0;
+			printf("{#turn to ps2}$\r\n");
+			break;
+		}//改蓝牙控制为ps2手柄控制
+		case '$': {
+			MOTOR_reset();
+			ps2_mode = 0;	control_mode = 0;  
+			printf("{#turn to bluetooth}$\r\n");
+			break;	
+		}							 //改ps2控制为蓝牙控制
 		
 		case '~' : {	//机动模式
 			MOTOR_reset();
@@ -508,86 +520,84 @@ void bluetooth_control(u8 order)
 		case '*' : HAL_UART_Transmit(&huart2,(uint8_t *)&receiver2,1,1); break;//视觉debug
 		
 		case '@' : {
-			printf("debug mode start\r\n");
-			printf("please select one motor\r\n");
+			printf("{#debug mode start}$\r\n");
+			printf("{#please select one motor: \r\n底盘电机：fl fr bl br\r\n舵机：sf sb st}$\r\n");
 			scanf("%s",rx1_buffer);
 			if(rx1_buffer[0]=='f'&&rx1_buffer[1]=='l'){	//前左电机
-				printf("angle or speed?\r\n");
+				printf("{#angle or speed?}$\r\n");
 				scanf("%c",&receiver1);
 				if(receiver1=='a'){
-					printf("input target angle\r\n");
+					printf("{#input target angle}$\r\n");
 					MOTOR_reset(); 
 					control_mode=1;
 					scanf("%f",&Forward_L.target_angle);
 				}else{
-					printf("input target speed\r\n");
+					printf("{#input target speed}$\r\n");
 					MOTOR_reset(); 
 					control_mode=0;
 					scanf("%f",&Forward_L.target_speed);
 				}
 			}
 			if(rx1_buffer[0]=='f'&&rx1_buffer[1]=='r'){	//前右电机
-				printf("angle or speed?\r\n");
+				printf("{#angle or speed?}$\r\n");
 				scanf("%c",&receiver1);
 				if(receiver1=='a'){
-					printf("input target angle\r\n");
+					printf("{#input target angle}$\r\n");
 					MOTOR_reset(); 
 					
 					control_mode=1;
 					scanf("%f",&Forward_R.target_angle);
 				}else{
-					printf("input target speed\r\n");
+					printf("{#input target speed}$\r\n");
 					MOTOR_reset(); 
 					control_mode=0;
 					scanf("%f",&Forward_R.target_speed);
 				}
 			}
 			if(rx1_buffer[0]=='b'&&rx1_buffer[1]=='l'){	//后左电机
-				printf("angle or speed?\r\n");
+				printf("{#angle or speed?}$\r\n");
 				scanf("%c",&receiver1);
 				if(receiver1=='a'){
-					printf("input target angle\r\n");
+					printf("{#input target angle}$\r\n");
 					MOTOR_reset(); 
 					control_mode=1;
 					scanf("%f",&Back_L.target_angle);
 				}else{
-					printf("input target speed\r\n");
+					printf("{#input target speed}$\r\n");
 					MOTOR_reset(); 
 					control_mode=0;
 					scanf("%f",&Back_L.target_speed);
 				}
 			}
 			if(rx1_buffer[0]=='b'&&rx1_buffer[1]=='r'){	//后右电机
-				printf("angle or speed?\r\n");
+				printf("{#angle or speed?}$\r\n");
 				scanf("%c",&receiver1);
 				if(receiver1=='a'){
-					printf("input target angle\r\n");
+					printf("{#input target angle}$\r\n");
 					MOTOR_reset(); 
 					control_mode=1;
 					scanf("%f",&Back_R.target_angle);
 				}else{
-					printf("input target speed\r\n");
+					printf("{#input target speed}$\r\n");
 					MOTOR_reset(); 
 					control_mode=0;
 					scanf("%f",&Back_R.target_speed);
 				}
 			}
 			if(rx1_buffer[0]=='s'&&rx1_buffer[1]=='f'){	//前爪舵机
-				printf("input target angle\r\n");
+				printf("{#input target angle}$\r\n");
 				scanf("%f",&Steer_f.angle);
 			}
 			if(rx1_buffer[0]=='s'&&rx1_buffer[1]=='b'){	//后爪舵机
-				printf("input target angle\r\n");
+				printf("{#input target angle}$\r\n");
 				scanf("%f",&Steer_b.angle);
 			}
 			if(rx1_buffer[0]=='s'&&rx1_buffer[1]=='t'){	//云台俯仰舵机
-				printf("input target angle\r\n");
+				printf("{#input target angle}$\r\n");
 				scanf("%f",&Turret.angle);
 			}			
 			break;
 		}
 	}
-	
 	order_last = order;
-
 }

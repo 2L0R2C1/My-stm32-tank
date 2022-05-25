@@ -26,8 +26,8 @@ void vision_control(u8 order){
 	static int t=0;  if(t>m)t=0; t++; int q=0;	
 	
 	if(order=='G')getdata();
-	if(order=='N')x=0,y=0,printf("no target\r\n");
-	if(order=='V')printf("lock target\r\n");
+	if(order=='N')x=0,y=0,printf("{#no target}$\r\n");
+	if(order=='V')printf("{#lock target}$\r\n");
 	
 //	if(x>-60&&x<60)xp[t] = x; else xp[t]=0;		//过滤过大值
 //	if(y>-15&&y<15)yp[t] = y; else yp[t]=0;
@@ -36,15 +36,17 @@ void vision_control(u8 order){
 //	xx=0.0f,yy=0.0f;
 //	while(q<m)xx += xp[q], yy += yp[q], q++;	//均值处理，使移动平滑
 //	xx = xx*70/(float)m; yy = yy/(float)m;
+	printf("{#x=%f y=%f}$\r\n",x,y);
+	
 	if(x<-60)x=-60;if(x>60)x=60;
-	if(y<-15)y=-10;if(y>15)y=10;
-	xx=x; yy=y;	
-	printf("xx=%f yy=%f\r\n",xx,yy);
+	if(y<-5)y=-5;if(y>5)y=5;
+	xx=x*70; yy=y;	
+	
 
 	Forward_L.target_angle += xx;
 	Forward_R.target_angle += xx;
 	Back_L.target_angle += xx,	
 	Back_R.target_angle += xx;
-	if(5<Turret.angle+yy&&Turret.angle+yy<=50)Turret.angle += yy;
+	if(10<Turret.angle+yy&&Turret.angle+yy<=50)Turret.angle += yy;
 }
 

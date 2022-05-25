@@ -167,13 +167,11 @@ int main(void)
 	
 	control_mode = 0;
 	ps2_mode = 0;
-  MOTOR_Init(); 
+	MOTOR_Init(); 
 	MOTOR_Tim_Init(&Forward_L);
 	MOTOR_Tim_Init(&Forward_R);
 	MOTOR_Tim_Init(&Back_L); 
 	MOTOR_Tim_Init(&Back_R); 
-	
-	
 	
 	printf("READY\r\n");
 
@@ -190,20 +188,24 @@ int main(void)
 	 // set_steer_pwm(&Steer_b);
 //	  set_steer_pwm(&Turret);
 	  steer_turn_slow(&Turret); 	
-
+/*
 //	  printf("turret angle %f\r\n",Turret.angle);
 //	  delay_ms(1000);
 //	  show_motor(&Forward_L);
 //	  show_motor(&Forward_R);
 //	  show_motor(&Back_L);
 //	  show_motor(&Back_R);
-/**/
+*/
 	  
-	 if(ps2_mode){	//ps2手柄控制模式
-		  delay_ms(50);	 //延时很重要不可去
-		  ps2_control( PS2_DataKey() );
-	 }
-  }
+	  if(ps2_mode){	//ps2手柄控制模式
+		 delay_ms(25);
+		  
+		 ps2_control(PS2_DataKey());
+			
+		 if(control_mode)ps2_angle();
+		 else ps2_speed();		 
+	  }
+	}
   /* USER CODE END 3 */
 }
 
