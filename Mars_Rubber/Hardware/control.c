@@ -155,6 +155,31 @@ void ps2_control(u8 order){
 			
 			MOTOR_reset(),control_mode=1;	delay_ms(500);
 			
+			Steer_f.angle = 110; //降前爪
+			delay_ms(3000);	
+			Back_L.target_angle = 70;  //后轮前进约40mm
+			Back_R.target_angle = 70;
+			delay_ms(3000);	
+			Forward_L.target_angle = 77; //前后轮前进 约45mm
+			Forward_R.target_angle = 77;
+			Back_L.target_angle = 77; 
+			Back_R.target_angle = 77;
+			delay_ms(3000);
+			Steer_b.angle = 130;          //降后爪
+			delay_ms(20);
+			Steer_f.angle =0;							//升前爪
+			Forward_L.target_angle = 350; //前轮前进20cm
+			Forward_R.target_angle = 350;
+			delay_ms(3000);
+			Steer_b.angle = 0;            //升后爪
+			Forward_L.target_angle = 60;  //前进一段距离
+			Forward_R.target_angle = 60;
+			Back_L.target_angle = 60; 
+			Back_R.target_angle = 60;
+			
+			
+			
+			/*
 			Steer_f.angle = 80;	 
 			delay_ms(3000);	
 			Back_L.target_angle = 400; 
@@ -165,7 +190,7 @@ void ps2_control(u8 order){
 			delay_ms(3000);
 			Forward_L.target_angle = 1080; 
 			Forward_R.target_angle = 1080;
-			delay_ms(3000);
+			delay_ms(3000);*/
 	
 			MOTOR_reset(),control_mode=0;	delay_ms(500);
 			
@@ -249,10 +274,11 @@ void ps2_control(u8 order){
 /*****************蓝牙控制代码****************/
 
 
-const float SPEED =2;
+const float SPEED =2.5;
 const float SPEED_UP =0.5f;
 const float SPEED_DOWN =0.5f;
 u8 order_last='Z';
+float std_speed = SPEED;
 
 
 void stop(void)         //停止
@@ -323,7 +349,10 @@ void fright(void)       //前右
 		delay_ms(50);	
 	}
 	if(order_last=='B')return;
-	Back_L.target_speed =  1.5f*Forward_L.target_speed;
+	Back_L.target_speed =  1.2f*std_speed;
+	Forward_L.target_speed = 1.2f*std_speed;
+	Back_R.target_speed =  0.8f*std_speed;
+	Forward_R.target_speed = 0.8f*std_speed;
 	delay_ms(50);	
 }
 void bright(void)       //后右
@@ -337,8 +366,11 @@ void bright(void)       //后右
 		delay_ms(50);
 	}
 	if(order_last=='D')return;
-	Back_L.target_speed =1.5f*Forward_L.target_speed;
-	//Back_R.target_speed = Forward_R.target_speed;
+	Back_L.target_speed = -(0.8f*std_speed);
+	Forward_L.target_speed = -(0.8f*std_speed);
+	Back_R.target_speed = -(1.2f*std_speed);
+	Forward_R.target_speed = -(1.2f*std_speed);
+	
 	delay_ms(50);
 }
 void fleft(void)        //前左
@@ -352,7 +384,11 @@ void fleft(void)        //前左
 		delay_ms(50);
 	}
 	if(order_last=='H')return;
-	Back_R.target_speed =1.5f*Forward_R.target_speed;
+	Back_R.target_speed = 1.2f*std_speed;
+	Forward_R.target_speed = 1.2f*std_speed;
+	Back_L.target_speed = 0.8f*std_speed;
+	Forward_L.target_speed = 0.8f*std_speed;
+	
 	delay_ms(50);	
 }
 void bleft(void)        //后左
@@ -366,8 +402,10 @@ void bleft(void)        //后左
 		delay_ms(50);
 	}
 	if(order_last=='F')return;
-	//Back_R.target_speed = 1.5*Forward_R.target_speed;
-	Back_L.target_speed = 1.5f*Forward_L.target_speed;
+	Back_L.target_speed = -(0.8f*std_speed);
+	Forward_L.target_speed = -(0.8f*std_speed);
+	Back_R.target_speed = -(1.2f*std_speed);
+	Forward_R.target_speed = -(1.2f*std_speed);
 	delay_ms(50);
 }
 
@@ -378,6 +416,7 @@ void speed_up(void)     //加速
 		Forward_R.target_speed +=SPEED_UP;
 		Back_L.target_speed +=SPEED_UP;
 		Back_R.target_speed +=SPEED_UP;
+		std_speed +=SPEED_UP;
 		delay_ms(50);	return;
 	}
 	if(order_last=='E'||order_last=='F'||order_last=='D'||order_last=='X'){
@@ -385,6 +424,7 @@ void speed_up(void)     //加速
 		Forward_R.target_speed -=SPEED_UP;
 		Back_L.target_speed -=SPEED_UP;
 		Back_R.target_speed -=SPEED_UP;
+		std_speed -=SPEED_UP;
 		delay_ms(50);	return;
 	}
 
@@ -398,6 +438,7 @@ void speed_down(void)   //减速
 		Forward_R.target_speed -=SPEED_DOWN;
 		Back_L.target_speed -=SPEED_DOWN;
 		Back_R.target_speed -=SPEED_DOWN;
+		std_speed -=SPEED_DOWN;
 		delay_ms(50);	
 	}
 	if(order_last=='E'||order_last=='F'||order_last=='D'||order_last=='Y'){
@@ -406,6 +447,7 @@ void speed_down(void)   //减速
 		Forward_R.target_speed +=SPEED_DOWN;
 		Back_L.target_speed +=SPEED_DOWN;
 		Back_R.target_speed +=SPEED_DOWN;
+		std_speed +=SPEED_DOWN;
 		delay_ms(50);	
 	}
 
@@ -424,7 +466,7 @@ void Steer_f_down(void) //降前爪
 }
 void Steer_b_up(void)   //升后爪
 {
-	Steer_b.angle = 0;
+	Steer_b.angle = 0 ;
 	set_steer_pwm(&Steer_b);
 }
 void Steer_b_down(void) //降后爪
@@ -476,6 +518,9 @@ void bluetooth_control(u8 order)
 		case 'w': HAL_UART_Transmit(&huart3,(u8*)&order,1,1);break;
 		case 'k': HAL_UART_Transmit(&huart3,(u8*)&order,1,1);break;
 			
+		case 'l': HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_SET); //开灯
+		case 'r': HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_RESET); //关灯
+		
 		case '#': {
 			MOTOR_reset();
 			ps2_mode = 1; control_mode = 0;

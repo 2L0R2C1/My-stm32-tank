@@ -7,6 +7,7 @@
 
 /**************核心控制代码****************/
 u8 friction_enable = 0;
+#define SPEEDMAX 200
 
 void friction_init(void){
 #ifdef L298N
@@ -18,8 +19,8 @@ void friction_init(void){
 	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
 	
-	__HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_1,150);
-	__HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_2,150);
+	__HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_1,SPEEDMAX);
+	__HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_2,SPEEDMAX);
 
 	delay_ms(3000);
 	
@@ -51,7 +52,7 @@ void friction_start(void){
 #endif
 	
 #ifdef A2312
-	for(pwm=100;pwm<=150;pwm+=2){		//缓慢启动电机，避免大电流烧坏电驱
+	for(pwm=100;pwm<=SPEEDMAX;pwm+=2){		//缓慢启动电机，避免大电流烧坏电驱
 		__HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_1,pwm);
 		__HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_2,pwm);
 		delay_ms(50);
@@ -76,7 +77,7 @@ void friction_stop(void){
 #endif
 	
 #ifdef A2312
-	for(pwm=150;pwm>=100;pwm-=5){		//缓慢启动电机，避免大电流烧坏电驱
+	for(pwm=SPEEDMAX;pwm>=100;pwm-=5){		//缓慢启动电机，避免大电流烧坏电驱
 		__HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_1,pwm);
 		__HAL_TIM_SetCompare(&htim3,TIM_CHANNEL_2,pwm);
 		delay_ms(50);
