@@ -276,7 +276,7 @@ void ps2_control(u8 order){
 /*****************蓝牙控制代码****************/
 
 
-const float SPEED =2.5;
+const float SPEED =3;
 const float SPEED_UP =0.5f;
 const float SPEED_DOWN =0.5f;
 u8 order_last='Z';
@@ -297,8 +297,11 @@ void forward(void)      //前进
 	if(order_last=='A'||order_last=='D'||order_last=='E'||order_last=='F'||order_last=='X'||order_last=='Y')return;
 	if(order_last=='B'||order_last=='H')
   {
-	  Back_L.target_speed = Forward_L.target_speed;
-	  Back_R.target_speed = Forward_R.target_speed;
+	  Back_L.target_speed =std_speed;
+		Forward_L.target_speed =std_speed;
+	  Back_R.target_speed =std_speed;
+		Forward_R.target_speed =std_speed;
+		
 		delay_ms(50);	return;
 	}
 	Forward_L.target_speed = SPEED;
@@ -312,8 +315,10 @@ void back(void)         //后退
 	if(order_last=='A'||order_last=='B'||order_last=='E'||order_last=='H'||order_last=='X'||order_last=='Y')return;
 	if(order_last=='F'||order_last=='D')
   {
-	  Back_L.target_speed = Forward_L.target_speed;
-	  Back_R.target_speed = Forward_R.target_speed;
+	  Back_L.target_speed =-std_speed;
+		Forward_L.target_speed=-std_speed;;
+	  Back_R.target_speed =-std_speed;
+		Forward_R.target_speed=-std_speed;;
 		delay_ms(50);	return;
 	}
 	Forward_L.target_speed = -SPEED;
@@ -327,16 +332,16 @@ void right(void)        //右转
 {
 	Forward_L.target_speed =0;
 	Forward_R.target_speed =0;
-	Back_L.target_speed = 1.5f;
-	Back_R.target_speed = -1.5f;
+	Back_L.target_speed = 1.0f;
+	Back_R.target_speed = -1.0f;
 	delay_ms(50);	
 }
 void left(void)         //左转
 {
 	Forward_L.target_speed =0;
 	Forward_R.target_speed =0;
-	Back_L.target_speed = -1.5f;
-	Back_R.target_speed = 1.5f;
+	Back_L.target_speed = -1.0f;
+	Back_R.target_speed = 1.0f;
 	delay_ms(50);
 }
 

@@ -431,6 +431,9 @@ void bluetooth_control(u8 order)
 		case 'o': HAL_UART_Transmit(&huart3,(u8*)&order,1,1);break;
 		case 'w': HAL_UART_Transmit(&huart3,(u8*)&order,1,1);break;
 		case 'k': HAL_UART_Transmit(&huart3,(u8*)&order,1,1);break;
+		
+		case 'l': HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_SET); //开灯
+		case 'r': HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_RESET); //关灯
 			
 		case '#': ps2_mode = 1;	break;//改蓝牙控制为ps2手柄控制
 		case '$': ps2_mode = 0;	break;								 //改ps2控制为蓝牙控制
