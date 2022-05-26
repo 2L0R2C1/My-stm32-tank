@@ -3,6 +3,8 @@
 
 #include "main.h"
 
+void auto_step(void);
+
 void ps2_control(u8 order);
 
 void ps2_angle(void);

@@ -154,9 +154,11 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+	
+	steer_init();
 
 	HAL_UART_Receive_IT(&huart1,(uint8_t *)&receiver1,1);
-//	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
+	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
 //	HAL_UART_Receive_IT(&huart3,(uint8_t *)&receiver3,1);
 	
 //	HAL_UART_Receive_IT(&huart2,rx2_buffer,10);
@@ -165,15 +167,14 @@ int main(void)
 	
 	control_mode = 0;
 	ps2_mode = 0;
-    MOTOR_Init(); 
+	MOTOR_Init(); 
 	MOTOR_Tim_Init(&Forward_L);
 	MOTOR_Tim_Init(&Forward_R);
 	MOTOR_Tim_Init(&Back_L); 
 	MOTOR_Tim_Init(&Back_R); 
 	
-	steer_init();
-	
 	printf("READY\r\n");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -183,22 +184,28 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  set_steer_pwm(&Steer_f);
-//	  set_steer_pwm(&Steer_b);
-	  steer_turn_slow(&Turret);
-
+	//  set_steer_pwm(&Steer_f);
+	 // set_steer_pwm(&Steer_b);
+//	  set_steer_pwm(&Turret);
+	  steer_turn_slow(&Turret); 	
+/*
+//	  printf("turret angle %f\r\n",Turret.angle);
 //	  delay_ms(1000);
 //	  show_motor(&Forward_L);
 //	  show_motor(&Forward_R);
 //	  show_motor(&Back_L);
 //	  show_motor(&Back_R);
-/**/
+*/
 	  
-	 if(ps2_mode){	//ps2手柄控制模式
-		  delay_ms(50);	 //延时很重要不可去
-		  ps2_control( PS2_DataKey() );
-	 }
-  }
+	  if(ps2_mode){	//ps2手柄控制模式
+		 delay_ms(10);
+		  
+		 ps2_control(PS2_DataKey());
+			
+		 if(control_mode)ps2_angle();
+		 else ps2_speed();		 
+	  }
+	}
   /* USER CODE END 3 */
 }
 

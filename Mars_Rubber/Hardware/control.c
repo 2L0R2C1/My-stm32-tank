@@ -20,6 +20,49 @@ float geer=3;			//小车速度挡位，共4挡，对应最高速度1、2、3、4r/s，默认第三档
 u8 i=0, n=15;			//n与速度挡位有关		
 
 
+void auto_step(void)
+{
+	MOTOR_reset(),control_mode=1;	delay_ms(500);
+			
+			Steer_f.angle = 110; //降前爪
+			delay_ms(3000);	
+			Back_L.target_angle = 70;  //后轮前进约40mm
+			Back_R.target_angle = 70;
+			delay_ms(3000);	
+			Forward_L.target_angle = 77; //前后轮前进 约45mm
+			Forward_R.target_angle = 77;
+			Back_L.target_angle = 77; 
+			Back_R.target_angle = 77;
+			delay_ms(3000);
+			Steer_b.angle = 130;          //降后爪
+			delay_ms(20);
+			Steer_f.angle =0;							//升前爪
+			Forward_L.target_angle = 350; //前轮前进20cm
+			Forward_R.target_angle = 350;
+			delay_ms(3000);
+			Steer_b.angle = 0;            //升后爪
+			Forward_L.target_angle = 60;  //前进一段距离
+			Forward_R.target_angle = 60;
+			Back_L.target_angle = 60; 
+			Back_R.target_angle = 60;
+			
+			
+			/*
+			Steer_f.angle = 80;	 
+			delay_ms(3000);	
+			Back_L.target_angle = 400; 
+			Back_R.target_angle = 400;
+			delay_ms(3000);	
+			Steer_f.angle =0;
+			Steer_b.angle = 80;
+			delay_ms(3000);
+			Forward_L.target_angle = 1080; 
+			Forward_R.target_angle = 1080;
+			delay_ms(3000);*/
+	
+			MOTOR_reset(),control_mode=0;	delay_ms(500);
+}
+
 void ps2_angle(void){		//调方向模式，打靶
 //	printf("{# %5d %5d %5d %5d }$\r\n",PS2_AnologData(PSS_LX),PS2_AnologData(PSS_LY),
 //		                              PS2_AnologData(PSS_RX),PS2_AnologData(PSS_RY) );
@@ -152,48 +195,7 @@ void ps2_control(u8 order){
 		
 		case PSB_PAD_RIGHT : {	//全自动爬梯
 //			while(PS2_DataKey()==PSB_PAD_RIGHT&&t<3)t++,delay_ms(10);//等待按键松开，限制按下并松开为一次有效按键
-			
-			MOTOR_reset(),control_mode=1;	delay_ms(500);
-			
-			Steer_f.angle = 110; //降前爪
-			delay_ms(3000);	
-			Back_L.target_angle = 70;  //后轮前进约40mm
-			Back_R.target_angle = 70;
-			delay_ms(3000);	
-			Forward_L.target_angle = 77; //前后轮前进 约45mm
-			Forward_R.target_angle = 77;
-			Back_L.target_angle = 77; 
-			Back_R.target_angle = 77;
-			delay_ms(3000);
-			Steer_b.angle = 130;          //降后爪
-			delay_ms(20);
-			Steer_f.angle =0;							//升前爪
-			Forward_L.target_angle = 350; //前轮前进20cm
-			Forward_R.target_angle = 350;
-			delay_ms(3000);
-			Steer_b.angle = 0;            //升后爪
-			Forward_L.target_angle = 60;  //前进一段距离
-			Forward_R.target_angle = 60;
-			Back_L.target_angle = 60; 
-			Back_R.target_angle = 60;
-			
-			
-			
-			/*
-			Steer_f.angle = 80;	 
-			delay_ms(3000);	
-			Back_L.target_angle = 400; 
-			Back_R.target_angle = 400;
-			delay_ms(3000);	
-			Steer_f.angle =0;
-			Steer_b.angle = 80;
-			delay_ms(3000);
-			Forward_L.target_angle = 1080; 
-			Forward_R.target_angle = 1080;
-			delay_ms(3000);*/
-	
-			MOTOR_reset(),control_mode=0;	delay_ms(500);
-			
+			auto_step();			
 			break;
 		}
 		
@@ -489,22 +491,23 @@ void Turret_down(void) //炮台下调
 void bluetooth_control(u8 order)     
 {
 	switch(order){
-		case 'A':	forward(); 	break;	//正前		        
-		case 'B':	fright();  	break;	//前右 									        
-		case 'C':	right();   	break;	//向右				        	        
-		case 'D': 	bright();  	break;	//后右            				        
-		case 'E':	back();    	break;  //正后            				        
-		case 'F':	bleft();  	break;  //后左            				        
-		case 'G':	left();    	break;  //向左            				        
-		case 'H':	fleft();   	break;  //前左            				        
-		case 'Z':	stop();    	break;	//停止           				        
-		case 'X':	speed_up();	break;	//加速            				        
+		case 'A':	forward(); 	 break;	//正前		        
+		case 'B':	fright();  	 break;	//前右 									        
+		case 'C':	right();   	 break;	//向右				        	        
+		case 'D': 	bright();  	 break;	//后右            				        
+		case 'E':	back();    	 break;  //正后            				        
+		case 'F':	bleft();  	 break;  //后左            				        
+		case 'G':	left();    	 break;  //向左            				        
+		case 'H':	fleft();   	 break;  //前左            				        
+		case 'Z':	stop();    	 break;	//停止           				        
+		case 'X':	speed_up();	 break;	//加速            				        
 		case 'Y':	speed_down();break;	//减速   
 
 		case 'b': Steer_f_up();		break;	//升前爪
 		case 'c': Steer_b_up();		break;  //升后爪
 		case 'e': Steer_f_down();	break;	//降前爪
 		case 'f': Steer_b_down();	break;	//降后爪
+		case 't': auto_step();		break;  //自动爬梯
 		//云台舵机
 		case 'h': Turret_up();    break;  //炮塔上仰
 		case 'i': Turret_down();  break;  //炮塔下调	
