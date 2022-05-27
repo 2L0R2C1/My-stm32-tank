@@ -116,7 +116,7 @@ void Error_Handler(void);
 #define Forward_L_IN2_Pin GPIO_PIN_5
 #define Forward_L_IN2_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-
+//#define debug
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

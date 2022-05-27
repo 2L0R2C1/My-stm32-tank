@@ -20,47 +20,37 @@ float geer=3;			//小车速度挡位，共4挡，对应最高速度1、2、3、4r/s，默认第三档
 u8 i=0, n=15;			//n与速度挡位有关		
 
 
+
 void auto_step(void)
-{
-	MOTOR_reset(),control_mode=1;	delay_ms(500);
-			
-			Steer_f.angle = 110; //降前爪
-			delay_ms(3000);	
-			Back_L.target_angle = 70;  //后轮前进约40mm
-			Back_R.target_angle = 70;
-			delay_ms(3000);	
-			Forward_L.target_angle = 77; //前后轮前进 约45mm
-			Forward_R.target_angle = 77;
-			Back_L.target_angle = 77; 
-			Back_R.target_angle = 77;
-			delay_ms(3000);
-			Steer_b.angle = 130;          //降后爪
-			delay_ms(20);
-			Steer_f.angle =0;							//升前爪
-			Forward_L.target_angle = 350; //前轮前进20cm
-			Forward_R.target_angle = 350;
-			delay_ms(3000);
-			Steer_b.angle = 0;            //升后爪
-			Forward_L.target_angle = 60;  //前进一段距离
-			Forward_R.target_angle = 60;
-			Back_L.target_angle = 60; 
-			Back_R.target_angle = 60;
-			
-			
-			/*
-			Steer_f.angle = 80;	 
-			delay_ms(3000);	
-			Back_L.target_angle = 400; 
-			Back_R.target_angle = 400;
-			delay_ms(3000);	
-			Steer_f.angle =0;
-			Steer_b.angle = 80;
-			delay_ms(3000);
-			Forward_L.target_angle = 1080; 
-			Forward_R.target_angle = 1080;
-			delay_ms(3000);*/
+{			
+	stop();
+	Steer_f.angle = 110; //降前爪
+	set_steer_pwm(&Steer_f);
+	delay_ms(500);	
 	
-			MOTOR_reset(),control_mode=0;	delay_ms(500);
+	Forward_L.target_speed = 0.5;
+	Forward_R.target_speed = 0.5;
+	Back_L.target_speed = 0.5;
+	Back_R.target_speed = 0.5;
+	delay_ms(1500);
+	
+	stop();
+	Steer_f.angle =0;			//升前爪
+	Steer_b.angle = 125;          //降后爪
+	set_steer_pwm(&Steer_f);
+	set_steer_pwm(&Steer_b);
+	delay_ms(1500);
+	
+	Forward_L.target_speed = 3;
+	Forward_R.target_speed = 3;
+	Back_L.target_speed = 3;
+	Back_R.target_speed = 3;
+	delay_ms(800);
+	 
+	stop();
+	Steer_b.angle = 0;            //升后爪
+	set_steer_pwm(&Steer_b);
+	delay_ms(500);
 }
 
 void ps2_angle(void){		//调方向模式，打靶
@@ -70,10 +60,10 @@ void ps2_angle(void){		//调方向模式，打靶
 	i16 x = PS2_AnologData(PSS_LX) - 128; //摇杆x、y轴坐标
 	i16 y = PS2_AnologData(PSS_LY) ; 
 	
-	float xx = 70*(float)x/128.0f;
+	float xx = 3*(float)x/128.0f;
 	float yy = 0.0f;
 	
-	if(y<80)yy=-2; if(y>160)yy=2;
+	if(y<30)yy=-2; if(y>220)yy=2;
 	
 	Forward_L.target_angle += xx;
 	Forward_R.target_angle -= xx;
@@ -133,8 +123,8 @@ void ps2_speed(void){		//正常前进模式
 //	printf("v = %f\r\n w = %f\r\n",v,w);
 */	
 	v = geer*(float)y/128.0f;	//摇杆y坐标映射为小车前进速度，速度范围-geer ~ geer
-	w = (geer/3)*(float)x/128.0f; //摇杆x坐标映射为小车转弯量
-	if(z<80)z=-2; else if(z>160)z=2; else z=0;
+	w = (geer/5)*(float)x/128.0f; //摇杆x坐标映射为小车转弯量
+	if(z<30)z=-2; else if(z>220)z=2; else z=0;
 	
 	if(v>=0){
 		Forward_L.target_speed = v+w;	
@@ -160,7 +150,7 @@ void ps2_control(u8 order){
 	switch(order){
 		
 		case PSB_START : {	//reset
-			while(PS2_DataKey()==PSB_START)delay_ms(10);//等待按键松开，限制按下并松开为一次有效按键
+			while(PS2_DataKey()==PSB_START)delay_ms(50);//等待按键松开，限制按下并松开为一次有效按键
 			HAL_NVIC_SystemReset();	//强制复位程序
 		}
 		
@@ -177,9 +167,9 @@ void ps2_control(u8 order){
 		
 		case PSB_PAD_DOWN : {		//后爪降，前爪归位
 //			while(PS2_DataKey()==PSB_PAD_DOWN&&t<3)t++,delay_ms(10);
-			if(Steer_b.angle < 130){
+			if(Steer_b.angle < 125){
 				//Steer_f.angle = 0, Steer_b.angle += 10;
-				Steer_f.angle = 0; Steer_b.angle = 130;
+				Steer_f.angle = 0; Steer_b.angle = 125;
 				set_steer_pwm(&Steer_f);
 				set_steer_pwm(&Steer_b);
 			}
@@ -279,7 +269,7 @@ void ps2_control(u8 order){
 const float SPEED =3;
 const float SPEED_UP =0.5f;
 const float SPEED_DOWN =0.5f;
-u8 order_last='Z';
+
 float std_speed = SPEED;
 
 
@@ -294,170 +284,80 @@ void stop(void)         //停止
 
 void forward(void)      //前进
 {
-	if(order_last=='A'||order_last=='D'||order_last=='E'||order_last=='F'||order_last=='X'||order_last=='Y')return;
-	if(order_last=='B'||order_last=='H')
-  {
-	  Back_L.target_speed =std_speed;
-		Forward_L.target_speed =std_speed;
-	  Back_R.target_speed =std_speed;
-		Forward_R.target_speed =std_speed;
-		
-		delay_ms(50);	return;
-	}
-	Forward_L.target_speed = SPEED;
-	Forward_R.target_speed = SPEED;
-	Back_L.target_speed = SPEED;
-	Back_R.target_speed = SPEED;
+	Back_L.target_speed =std_speed;
+	Forward_L.target_speed =std_speed;
+	Back_R.target_speed =std_speed;
+	Forward_R.target_speed =std_speed;
 	delay_ms(50);	
 }
 void back(void)         //后退
 {
-	if(order_last=='A'||order_last=='B'||order_last=='E'||order_last=='H'||order_last=='X'||order_last=='Y')return;
-	if(order_last=='F'||order_last=='D')
-  {
-	  Back_L.target_speed =-std_speed;
-		Forward_L.target_speed=-std_speed;;
-	  Back_R.target_speed =-std_speed;
-		Forward_R.target_speed=-std_speed;;
-		delay_ms(50);	return;
-	}
-	Forward_L.target_speed = -SPEED;
-	Forward_R.target_speed = -SPEED;
-	Back_L.target_speed = -SPEED;
-	Back_R.target_speed = -SPEED;
-	delay_ms(50);	
+	Back_L.target_speed =-std_speed;
+	Forward_L.target_speed=-std_speed;;
+	Back_R.target_speed =-std_speed;
+	Forward_R.target_speed=-std_speed;;
+	delay_ms(50);
 }
 
 void right(void)        //右转
 {
-	Forward_L.target_speed =0;
-	Forward_R.target_speed =0;
-	Back_L.target_speed = 1.0f;
-	Back_R.target_speed = -1.0f;
+	Forward_L.target_speed =0.8f;
+	Forward_R.target_speed =-0.8f;
+	Back_L.target_speed = 0.8f;
+	Back_R.target_speed = -0.8f;
 	delay_ms(50);	
 }
 void left(void)         //左转
 {
-	Forward_L.target_speed =0;
-	Forward_R.target_speed =0;
-	Back_L.target_speed = -1.0f;
-	Back_R.target_speed = 1.0f;
+	Forward_L.target_speed =-0.8f;
+	Forward_R.target_speed =0.8f
+	;
+	Back_L.target_speed = -0.8f;
+	Back_R.target_speed = 0.8f;
 	delay_ms(50);
 }
 
 void fright(void)       //前右
 {
-	if(order_last=='Y'||order_last=='X')return;
-	if(order_last!='A'&&order_last!='B'){
-		Forward_L.target_speed = SPEED;
-		Forward_R.target_speed = SPEED;
-		Back_L.target_speed = SPEED;
-		Back_R.target_speed = SPEED;
-		delay_ms(50);	
-	}
-	if(order_last=='B')return;
-	Back_L.target_speed =  1.2f*std_speed;
-	Forward_L.target_speed = 1.2f*std_speed;
-	Back_R.target_speed =  0.8f*std_speed;
-	Forward_R.target_speed = 0.8f*std_speed;
+	Back_L.target_speed =  std_speed;
+	Forward_L.target_speed = std_speed;
+	Back_R.target_speed =  0.7f*std_speed;
+	Forward_R.target_speed = 0.7f*std_speed;
 	delay_ms(50);	
 }
 void bright(void)       //后右
 {
-	if(order_last=='Y'||order_last=='X')return;
-	if(order_last!='E'&&order_last!='D'){
-		Forward_L.target_speed = -SPEED;
-		Forward_R.target_speed = -SPEED;
-		Back_L.target_speed = -SPEED;
-		Back_R.target_speed = -SPEED;
-		delay_ms(50);
-	}
-	if(order_last=='D')return;
-	Back_L.target_speed = -(0.8f*std_speed);
-	Forward_L.target_speed = -(0.8f*std_speed);
-	Back_R.target_speed = -(1.2f*std_speed);
-	Forward_R.target_speed = -(1.2f*std_speed);
-	
+	Back_L.target_speed = -std_speed;
+	Forward_L.target_speed = -std_speed;
+	Back_R.target_speed = -0.7f*std_speed;
+	Forward_R.target_speed = -0.7f*std_speed;
 	delay_ms(50);
 }
 void fleft(void)        //前左
 {
-	if(order_last=='Y'||order_last=='X')return;
-	if(order_last!='A'&&order_last!='H'){
-		Forward_L.target_speed = SPEED;
-		Forward_R.target_speed = SPEED;
-		Back_L.target_speed = SPEED;
-		Back_R.target_speed = SPEED;
-		delay_ms(50);
-	}
-	if(order_last=='H')return;
-	Back_R.target_speed = 1.2f*std_speed;
-	Forward_R.target_speed = 1.2f*std_speed;
-	Back_L.target_speed = 0.8f*std_speed;
-	Forward_L.target_speed = 0.8f*std_speed;
-	
+	Back_R.target_speed = std_speed;
+	Forward_R.target_speed = std_speed;
+	Back_L.target_speed = 0.7f*std_speed;
+	Forward_L.target_speed = 0.7f*std_speed;
 	delay_ms(50);	
 }
 void bleft(void)        //后左
 {
-	if(order_last=='Y'||order_last=='X')return;
-	if(order_last!='E'&&order_last!='F'){
-		Forward_L.target_speed = -SPEED;
-		Forward_R.target_speed = -SPEED;
-		Back_L.target_speed = -SPEED;
-		Back_R.target_speed = -SPEED;
-		delay_ms(50);
-	}
-	if(order_last=='F')return;
-	Back_L.target_speed = -(0.8f*std_speed);
-	Forward_L.target_speed = -(0.8f*std_speed);
-	Back_R.target_speed = -(1.2f*std_speed);
-	Forward_R.target_speed = -(1.2f*std_speed);
+	Back_L.target_speed = -(0.7f*std_speed);
+	Forward_L.target_speed = -(0.7f*std_speed);
+	Back_R.target_speed = -std_speed;
+	Forward_R.target_speed = -std_speed;
 	delay_ms(50);
 }
 
 void speed_up(void)     //加速
 {
-	if(order_last=='A'||order_last=='H'||order_last=='B'||order_last=='X'){
-		Forward_L.target_speed +=SPEED_UP;
-		Forward_R.target_speed +=SPEED_UP;
-		Back_L.target_speed +=SPEED_UP;
-		Back_R.target_speed +=SPEED_UP;
-		std_speed +=SPEED_UP;
-		delay_ms(50);	return;
-	}
-	if(order_last=='E'||order_last=='F'||order_last=='D'||order_last=='X'){
-		Forward_L.target_speed -=SPEED_UP;
-		Forward_R.target_speed -=SPEED_UP;
-		Back_L.target_speed -=SPEED_UP;
-		Back_R.target_speed -=SPEED_UP;
-		std_speed -=SPEED_UP;
-		delay_ms(50);	return;
-	}
-
+	std_speed += SPEED_UP;
 }
 	
 void speed_down(void)   //减速
 {
-	if(order_last=='A'||order_last=='H'||order_last=='B'||order_last=='Y'){
-		if(Forward_L.target_speed * Forward_R.target_speed * Back_L.target_speed * Back_R.target_speed <= 0) return;
-		Forward_L.target_speed -=SPEED_DOWN;
-		Forward_R.target_speed -=SPEED_DOWN;
-		Back_L.target_speed -=SPEED_DOWN;
-		Back_R.target_speed -=SPEED_DOWN;
-		std_speed -=SPEED_DOWN;
-		delay_ms(50);	
-	}
-	if(order_last=='E'||order_last=='F'||order_last=='D'||order_last=='Y'){
-		if(Forward_L.target_speed >= 0 || Forward_R.target_speed >= 0) return;
-		Forward_L.target_speed +=SPEED_DOWN;
-		Forward_R.target_speed +=SPEED_DOWN;
-		Back_L.target_speed +=SPEED_DOWN;
-		Back_R.target_speed +=SPEED_DOWN;
-		std_speed +=SPEED_DOWN;
-		delay_ms(50);	
-	}
-
+	std_speed -= SPEED_DOWN;
 }
 	
 void Steer_f_up(void)  //升前爪
@@ -466,8 +366,8 @@ void Steer_f_up(void)  //升前爪
 }
 void Steer_f_down(void) //降前爪
 {
-//	if(Steer_f.angle<110)Steer_f.angle +=10;
-	Steer_f.angle = 110; 
+	if(Steer_f.angle<110)Steer_f.angle +=10;
+	//Steer_f.angle = 110; 
 	set_steer_pwm(&Steer_f);
 	Steer_b_up();
 }
@@ -478,8 +378,8 @@ void Steer_b_up(void)   //升后爪
 }
 void Steer_b_down(void) //降后爪
 {
-//	if(Steer_b.angle<130)Steer_b.angle += 10;
-	Steer_b.angle = 130; 
+	if(Steer_b.angle<125)Steer_b.angle += 10;
+	//Steer_b.angle = 125; 
 	set_steer_pwm(&Steer_b);
 	Steer_f_up();
 }
@@ -492,6 +392,7 @@ void Turret_down(void) //炮台下调
 {
 	if(Turret.angle > 0)Turret.angle -= 2;
 }
+
 
 void bluetooth_control(u8 order)     
 {
@@ -652,5 +553,4 @@ void bluetooth_control(u8 order)
 			break;
 		}
 	}
-	order_last = order;
 }

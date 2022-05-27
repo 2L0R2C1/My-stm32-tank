@@ -67,7 +67,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+#ifdef debug
 void show_motor(MOTOR_TypeDef *motor){
 	printf("\r\n***\r\n");
 	if(motor==&Forward_L)printf("FL\r\n");
@@ -108,6 +108,7 @@ void show_motor(MOTOR_TypeDef *motor){
 //	printf("fp: %f\r\n",motor->k_angle.fp);
 */
 }
+#endif
 
 /* USER CODE END 0 */
 
@@ -184,6 +185,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+#ifdef debug
+	  show_motor(&Forward_L);
+	  show_motor(&Forward_R);
+	  show_motor(&Back_L);
+	  show_motor(&Back_R);
+#endif
 	//  set_steer_pwm(&Steer_f);
 	 // set_steer_pwm(&Steer_b);
 //	  set_steer_pwm(&Turret);
@@ -198,7 +205,7 @@ int main(void)
 */
 	  
 	  if(ps2_mode){	//ps2手柄控制模式
-		 delay_ms(10);
+		 delay_ms(50);
 		  
 		 ps2_control(PS2_DataKey());
 			

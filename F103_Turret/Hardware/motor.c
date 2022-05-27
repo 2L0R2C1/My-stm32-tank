@@ -151,8 +151,8 @@ void limit_pwm(MOTOR_TypeDef *motor){
 }
 
 void limit_speed(MOTOR_TypeDef *motor){
-	if(motor->target_speed > 0.5)motor->target_speed = 0.5;
-	if(motor->target_speed < -0.5)motor->target_speed = -0.5;
+	if(motor->target_speed > 0.3)motor->target_speed = 0.3;
+	if(motor->target_speed < -0.3)motor->target_speed = -0.3;
 }
 
 void check_pwm_speed(MOTOR_TypeDef *motor){		// v = pwm’ºø’±» * vmax

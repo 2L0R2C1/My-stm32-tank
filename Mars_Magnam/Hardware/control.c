@@ -9,7 +9,7 @@
 
 
 
-const float a=0.09, b=0.11;  //车长2a = 0.18m，车宽 2b = 0.22m	
+const float a=0.18, b=0.25;  //车长2a = 0.18m，车宽 2b = 0.25m	
 
 /**************PS2控制代码****************/
 
@@ -25,63 +25,57 @@ u8 i=0, n=15;			//n与速度挡位有关
 
 void auto_step(void)
 {
-	MOTOR_reset(),control_mode=1;	delay_ms(500);
-			
-			Steer_f.angle = 110; //降前爪
-			delay_ms(3000);	
-			Back_L.target_angle = 70;  //后轮前进约40mm
-			Back_R.target_angle = 70;
-			delay_ms(3000);	
-			Forward_L.target_angle = 77; //前后轮前进 约45mm
-			Forward_R.target_angle = 77;
-			Back_L.target_angle = 77; 
-			Back_R.target_angle = 77;
-			delay_ms(3000);
-			Steer_b.angle = 130;          //降后爪
-			delay_ms(20);
-			Steer_f.angle =0;							//升前爪
-			Forward_L.target_angle = 350; //前轮前进20cm
-			Forward_R.target_angle = 350;
-			delay_ms(3000);
-			Steer_b.angle = 0;            //升后爪
-			Forward_L.target_angle = 60;  //前进一段距离
-			Forward_R.target_angle = 60;
-			Back_L.target_angle = 60; 
-			Back_R.target_angle = 60;
-			
-			
-			/*
-			Steer_f.angle = 80;	 
-			delay_ms(3000);	
-			Back_L.target_angle = 400; 
-			Back_R.target_angle = 400;
-			delay_ms(3000);	
-			Steer_f.angle =0;
-			Steer_b.angle = 80;
-			delay_ms(3000);
-			Forward_L.target_angle = 1080; 
-			Forward_R.target_angle = 1080;
-			delay_ms(3000);*/
+	stop();
+	Steer_f.angle = 110; //降前爪
+	set_steer_pwm(&Steer_f);
+	delay_ms(500);	
 	
-			MOTOR_reset(),control_mode=0;	delay_ms(500);
+	Forward_L.target_speed = 0.5;
+	Forward_R.target_speed = 0.5;
+	Back_L.target_speed = 0.5;
+	Back_R.target_speed = 0.5;
+	delay_ms(1500);
+	
+	stop();
+	Steer_f.angle =0;			//升前爪
+	Steer_b.angle = 125;          //降后爪
+	set_steer_pwm(&Steer_f);
+	set_steer_pwm(&Steer_b);
+	delay_ms(1500);
+	
+	Forward_L.target_speed = 3;
+	Forward_R.target_speed = 3;
+	Back_L.target_speed = 3;
+	Back_R.target_speed = 3;
+	delay_ms(800);
+	 
+	stop();
+	Steer_b.angle = 0;            //升后爪
+	set_steer_pwm(&Steer_b);
+	delay_ms(500);
 }
 
 void ps2_angle(void){		//调方向模式，打靶
 	
-	i8 x = PS2_AnologData(PSS_LX) - 128; //摇杆x、y轴坐标
-	i8 y = PS2_AnologData(PSS_LY) - 127; 
+	i16 x = PS2_AnologData(PSS_RX) - 128; //右摇杆x、y轴坐标
+	i16 y = 127 - PS2_AnologData(PSS_RY);
+	i16 w = PS2_AnologData(PSS_LX) - 128; //左摇杆x轴坐标
+	i16 z = PS2_AnologData(PSS_LY);
+	if(x>-20&&x<20) x=0;	//设置死区
+	if(y>-20&&y<20) y=0;
+	if(w>-40&&w<40) w=0;
+	if(z<30)z=-2; else if(z>220)z=2; else z=0;
 	
-	float xx = 70*(float)x/128.0f;
-	float yy = 5*(float)y/128.0f;
+	float vx = 2.5 * (float)x / 128;	//x、y坐标映射为小车x、y方向分速度（最大2m/s）
+	float vy = 2.5 * (float)y / 128;
+	float ww = 4 * (float)w / 128;		//w坐标映射为小车转速（最大3rad/s）
 	
-	Forward_L.target_angle += xx;
-	Forward_R.target_angle -= xx;
-	Back_L.target_angle += xx,	
-	Back_R.target_angle -= xx;
+//	printf("vx= %f\r\n vy= %f\r\n ww= %f\r\n",vx,vy,ww);
 	
-	if(0<=Turret.angle+yy&&Turret.angle+yy<=48){
-		Turret.angle += yy;
-	}
+	Forward_R.target_speed = vy - vx - ww*(a+b);
+	Forward_L.target_speed = vy + vx + ww*(a+b);
+	Back_L.target_speed = vy - vx + ww*(a+b);
+	Back_R.target_speed = vy + vx - ww*(a+b);
 	
 //	delay_ms(100);
 	
@@ -90,28 +84,45 @@ void ps2_angle(void){		//调方向模式，打靶
 	一轮前进速度与转弯量，抑制小车速度突变
 	//（这样做一是为了模拟真实开车，二是小车速度突变为0会导致ps2手柄断联）		
 //	printf("v = %f\r\n w = %f\r\n",v,w);
-*/	
-
-	float vx = 2.5f * (float)x / 128;	//x、y坐标映射为小车x、y方向分速度（最大2m/s）
-	float vy = 2.5f * (float)y / 128;
-	float ww = 4.0f * (float)w / 128;		//w坐标映射为小车转速（最大3rad/s）
-	float z = 5*(float)z/128.0f;
-	
-	Forward_R.target_speed = vy - vx - ww*(a+b);
-	Forward_L.target_speed = vy + vx + ww*(a+b);
-	Back_L.target_speed = vy - vx + ww*(a+b);
-	Back_R.target_speed = vy + vx - ww*(a+b);	
+*/		
 	
 	if(0<=Turret.angle+z&&Turret.angle+z<=48){
 		Turret.angle += z;
 	}
 }
 
+void ps2_speed(void){		//正常前进模式	
+	
+	i16 x = PS2_AnologData(PSS_RX) - 128; //右摇杆x、y轴坐标
+	i16 y = 127 - PS2_AnologData(PSS_RY);
+	i16 w = PS2_AnologData(PSS_LX) - 128; //左摇杆x轴坐标
+	i16 z = PS2_AnologData(PSS_LY);
+	
+	if(x>-40&&x<40) x=0;	//设置死区
+	if(y>-40&&y<40) y=0;
+	if(w>-40&&w<40) w=0;
+	if(z<30)z=-2; else if(z>220)z=2; else z=0;
+	
+	float vx = 2.5 * (float)x / 128;	//x、y坐标映射为小车x、y方向分速度（最大2m/s）
+	float vy = 2.5 * (float)y / 128;
+	float ww = 4 * (float)w / 128;		//w坐标映射为小车转速（最大3rad/s）
+	
+//	printf("vx= %f\r\n vy= %f\r\n ww= %f\r\n",vx,vy,ww);
+	
+	Forward_R.target_speed = vy - vx - ww*(a+b);
+	Forward_L.target_speed = vy + vx + ww*(a+b);
+	Back_L.target_speed = vy - vx + ww*(a+b);
+	Back_R.target_speed = vy + vx - ww*(a+b);
+	
+	if(0<=Turret.angle+z&&Turret.angle+z<=48){
+		Turret.angle += z;
+	}
+}
+
+
 void ps2_control(u8 order){
 	u8 t=0;
-	
-	if(control_mode)ps2_angle();
-	else ps2_speed();
+	if(!order)return;
 	
 	switch(order){
 		
@@ -120,20 +131,22 @@ void ps2_control(u8 order){
 			HAL_NVIC_SystemReset();	//强制复位程序
 		}
 		
-		case PSB_PAD_DOWN : {	//前爪降，后爪归位
-			while(PS2_DataKey()==PSB_PAD_DOWN&&t<3)t++,delay_ms(50);
-			if(Steer_f.angle < 80){
-				Steer_f.angle += 10, Steer_b.angle = 0; 
+		case PSB_PAD_UP : {	//前爪降，后爪归位
+//			while(PS2_DataKey()==PSB_PAD_UP&&t<3)t++,delay_ms(10);
+			if(Steer_f.angle < 110){
+				//Steer_f.angle += 10, Steer_b.angle = 0; 
+				Steer_f.angle = 110; Steer_b.angle = 0;
 				set_steer_pwm(&Steer_f);
 				set_steer_pwm(&Steer_b);
 			}
 			break;
 		}
 		
-		case PSB_PAD_UP : {		//后爪降，前爪归位
-			while(PS2_DataKey()==PSB_PAD_UP&&t<3)t++,delay_ms(50);
-			if(Steer_b.angle < 80){
-				Steer_f.angle = 0, Steer_b.angle += 10;
+		case PSB_PAD_DOWN : {		//后爪降，前爪归位
+//			while(PS2_DataKey()==PSB_PAD_DOWN&&t<3)t++,delay_ms(10);
+			if(Steer_b.angle < 125){
+				//Steer_f.angle = 0, Steer_b.angle += 10;
+				Steer_f.angle = 0; Steer_b.angle = 125;
 				set_steer_pwm(&Steer_f);
 				set_steer_pwm(&Steer_b);
 			}
@@ -141,21 +154,20 @@ void ps2_control(u8 order){
 		}
 		
 		case PSB_PAD_LEFT : {	//前后爪归位
-			while(PS2_DataKey()==PSB_PAD_LEFT&&t<3)t++,delay_ms(50);
+//			while(PS2_DataKey()==PSB_PAD_LEFT&&t<3)t++,delay_ms(10);
 			Steer_f.angle = 0, Steer_b.angle = 0;
 			set_steer_pwm(&Steer_f);
 			set_steer_pwm(&Steer_b);
 		}
 		
 		case PSB_PAD_RIGHT : {	//全自动爬梯
-			while(PS2_DataKey()==PSB_PAD_RIGHT)delay_ms(50);//等待按键松开，限制按下并松开为一次有效按键
-			auto_step();
-			
+//			while(PS2_DataKey()==PSB_PAD_RIGHT&&t<3)t++,delay_ms(10);//等待按键松开，限制按下并松开为一次有效按键
+			auto_step();			
 			break;
 		}
 		
 		case PSB_L1 : {		//加档，小车速度挡+1
-			while(PS2_DataKey()==PSB_L1)delay_ms(50);	//等待按键松开，限制按一次加一档
+//			while(PS2_DataKey()==PSB_L1&&t<3)t++,delay_ms(10);	//等待按键松开，限制按一次加一档
 			if(geer<4){
 				geer+=1;	
 	//			for(i=n;i>0;i--)V[i]=W[i]=0;
@@ -163,7 +175,7 @@ void ps2_control(u8 order){
 			break;
 		}
 		case PSB_L2 : {		//减档，小车速度挡-1
-			while(PS2_DataKey()==PSB_L2)delay_ms(50);	//等待按键松开，限制按一次加一档
+//			while(PS2_DataKey()==PSB_L2&&t<3)t++,delay_ms(10);	//等待按键松开，限制按一次加一档
 			if(geer>1){
 				geer-=1;	
 	//			for(i=n;i>0;i--)V[i]=W[i]=0;
@@ -172,20 +184,20 @@ void ps2_control(u8 order){
 		}
 		
 		case PSB_R1 : {		//给炮台主控单片机发送 单发一颗子弹 的指令
-			while(PS2_DataKey()==PSB_R1)delay_ms(50);	//等待按键松开，限制按一次发一颗子弹
+//			while(PS2_DataKey()==PSB_R1&&t<3)t++,delay_ms(10);	//等待按键松开，限制按一次发一颗子弹
 			receiver3 = 'o';
 			HAL_UART_Transmit(&huart3,(u8 *)&receiver3,1,1);
 			break;
 		}
 		case PSB_R2 : {		//给炮台主控单片机发送 连发五颗子弹 的指令
-			while(PS2_DataKey()==PSB_R2)delay_ms(50);	//等待按键松开，限制按一次发五颗子弹
+//			while(PS2_DataKey()==PSB_R2&&t<3)t++,delay_ms(10);	//等待按键松开，限制按一次发五颗子弹
 			receiver3 = 'w';
 			HAL_UART_Transmit(&huart3,(u8 *)&receiver3,1,1);
 			break;
 		}
 		
 		case PSB_PINK : {	//向树莓派发送“符文模式”指令
-			while(PS2_DataKey()==PSB_PINK)delay_ms(50);
+//			while(PS2_DataKey()==PSB_PINK&&t<3)t++,delay_ms(10);
 			MOTOR_reset();
 			receiver2 = '%';
 			HAL_UART_Transmit(&huart2,(uint8_t *)&receiver2,1,1);
@@ -195,7 +207,7 @@ void ps2_control(u8 order){
 		}
 			
 		case PSB_GREEN : {	//向树莓派发送“打靶模式”指令
-			while(PS2_DataKey()==PSB_GREEN)delay_ms(50);
+//			while(PS2_DataKey()==PSB_GREEN&&t<3)t++,delay_ms(10);
 			control_mode=1;
 			MOTOR_reset();
 			receiver2 = '&';
@@ -205,17 +217,17 @@ void ps2_control(u8 order){
 		}
 		
 		case PSB_BLUE : {	//向树莓派发送“机动模式”指令
-			while(PS2_DataKey()==PSB_BLUE)delay_ms(50);
+//			while(PS2_DataKey()==PSB_BLUE&&t<3)t++,delay_ms(10);
 			control_mode=0;
 			MOTOR_reset(); 
 			receiver2 = '~';
 			HAL_UART_Transmit(&huart2,(uint8_t *)&receiver2,1,1);
-		//	HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
+//			HAL_UART_Receive_IT(&huart2,(uint8_t *)&receiver2,1);
 			break;
 		}
 		
 		case PSB_RED : {	//停下摩擦轮电机
-			while(PS2_DataKey()==PSB_RED)delay_ms(50); 
+//			while(PS2_DataKey()==PSB_RED&&t<3)t++,delay_ms(10); 
 			receiver3 = 'n';
 			HAL_UART_Transmit(&huart3,(u8 *)&receiver3,1,1);
 			break;
@@ -385,7 +397,7 @@ void Steer_b_up(void)   //升后爪
 }
 void Steer_b_down(void) //降后爪
 {
-	Steer_b.angle = 130; 
+	Steer_b.angle = 125; 
 	set_steer_pwm(&Steer_b);
 	Steer_f_up();
 }
