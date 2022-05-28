@@ -101,6 +101,10 @@ void repeating_shot2(void) //连发
 	Bopan.target_angle=400;
 }
 
+void single_shot_(void){
+	if(!friction_enable)friction_start();	
+	Bopan.target_angle=-40;
+}
 
 void f411_control(u8 order)     
 {
@@ -111,7 +115,8 @@ void f411_control(u8 order)
 		case 'n':	friction_stop();	break;
 		case 'o':	single_shot(); 	    break;	//单发	        
 		case 'w':	repeating_shot1(); 	break;	//连发5	
-		case 'k':	repeating_shot2();  break;	//连发10		          				        
+		case 'k':	repeating_shot2();  break;	//连发10	
+		case 'p':	single_shot_();		break;
 	}
 	MOTOR_Init();
 	PID_init(&Bopan.k_double);

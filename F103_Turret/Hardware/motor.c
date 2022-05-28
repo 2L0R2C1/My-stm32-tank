@@ -146,13 +146,14 @@ void limit_pwm(MOTOR_TypeDef *motor){
 	if(motor->k_angle.integral <-(PWM_MAX/6) )motor->k_angle.integral = -(PWM_MAX/6);//限制位置式pid中的积分项过大
 	if(motor->k_angle.integral > (PWM_MAX/6) )motor->k_angle.integral = (PWM_MAX/6);
 	
-	if(motor->pwm <-(PWM_MAX/2) )motor->pwm = -(PWM_MAX/2);
-	if(motor->pwm > (PWM_MAX/2) )motor->pwm = (PWM_MAX/2);
+	if(motor->pwm <-(PWM_MAX) )motor->pwm = -(PWM_MAX);
+	if(motor->pwm > (PWM_MAX) )motor->pwm = (PWM_MAX);
 }
 
 void limit_speed(MOTOR_TypeDef *motor){
-	if(motor->target_speed > 0.3)motor->target_speed = 0.3;
-	if(motor->target_speed < -0.3)motor->target_speed = -0.3;
+	if(motor->target_speed > 0.35)motor->target_speed = 0.35;
+	if(motor->target_speed < -0.35)motor->target_speed = -0.35
+;
 }
 
 void check_pwm_speed(MOTOR_TypeDef *motor){		// v = pwm占空比 * vmax

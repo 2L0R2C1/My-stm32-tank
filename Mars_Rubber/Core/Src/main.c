@@ -205,12 +205,12 @@ int main(void)
 */
 	  
 	  if(ps2_mode){	//ps2手柄控制模式
-		 delay_ms(50);
+		 delay_ms(10);
 		  
 		 ps2_control(PS2_DataKey());
 			
-		 if(control_mode)ps2_angle();
-		 else ps2_speed();		 
+//		 if(control_mode)ps2_angle();
+//		 else ps2_speed();		 
 	  }
 	}
   /* USER CODE END 3 */

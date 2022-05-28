@@ -45,8 +45,8 @@ void set_steer_pwm(STEER_TypeDef *steer){
 
 void steer_turn_slow(STEER_TypeDef *steer){
 	int pwm = steer->A * steer->angle + steer->B;
-	if( steer->pwm > pwm ) steer->pwm -- , delay_ms(10);
-	if( steer->pwm < pwm ) steer->pwm ++ , delay_ms(10);
+	if( steer->pwm > pwm ) steer->pwm -- , delay_ms(2);
+	if( steer->pwm < pwm ) steer->pwm ++ , delay_ms(2);
 	__HAL_TIM_SetCompare(&steer->timepwm,steer->channelpwm,steer->pwm);
 }
 

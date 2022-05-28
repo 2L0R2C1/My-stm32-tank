@@ -44,6 +44,6 @@ void Steer_b_down(void);	//降后爪
 		//云台舵机
 void Turret_up(void);     //炮塔上仰
 void Turret_down(void);   //炮塔下调
-			
+void up_shoot(void);			
 
 #endif
