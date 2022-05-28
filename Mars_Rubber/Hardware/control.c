@@ -24,6 +24,7 @@ u8 i=0, n=15;			//n与速度挡位有关
 void auto_step(void)
 {			
 	stop();
+	Turret.angle = 5;
 	Steer_f.angle = 110; //降前爪
 	set_steer_pwm(&Steer_f);
 	delay_ms(500);	
@@ -45,7 +46,7 @@ void auto_step(void)
 	Forward_R.target_speed = 3;
 	Back_L.target_speed = 3;
 	Back_R.target_speed = 3;
-	delay_ms(800);
+	delay_ms(700);
 	 
 	stop();
 	Steer_b.angle = 0;            //升后爪
@@ -107,6 +108,11 @@ void ps2_speed(void){		//正常前进模式
 	i16 y = 127 - PS2_AnologData(PSS_RY);
 	
 	i16 z = PS2_AnologData(PSS_LY) ; 
+	
+	if(x>-50&&x<50)x=0;		//设置死区
+	if(y>-50&&y<50)y=0;
+//	if(w>-50&&w<50)w=0;
+	if(z<30)z=-2; else if(z>220)z=2; else z=0;
 
 
 /*	n = geer*5	; //if(n==5)n=2;

@@ -9,7 +9,7 @@
 
 
 
-const float a=0.18, b=0.25;  //车长2a = 0.18m，车宽 2b = 0.25m	
+const float a=0.09, b=0.125;  //车长2a = 0.18m，车宽 2b = 0.25m	
 
 /**************PS2控制代码****************/
 
@@ -34,20 +34,20 @@ void auto_step(void)
 	Forward_R.target_speed = 0.5;
 	Back_L.target_speed = 0.5;
 	Back_R.target_speed = 0.5;
-	delay_ms(1500);
+	delay_ms(1000);
 	
 	stop();
 	Steer_f.angle =0;			//升前爪
 	Steer_b.angle = 125;          //降后爪
 	set_steer_pwm(&Steer_f);
 	set_steer_pwm(&Steer_b);
-	delay_ms(1500);
+	delay_ms(2000);
 	
 	Forward_L.target_speed = 3;
 	Forward_R.target_speed = 3;
 	Back_L.target_speed = 3;
 	Back_R.target_speed = 3;
-	delay_ms(800);
+	delay_ms(700);
 	 
 	stop();
 	Steer_b.angle = 0;            //升后爪
@@ -61,9 +61,10 @@ void ps2_angle(void){		//调方向模式，打靶
 	i16 y = 127 - PS2_AnologData(PSS_RY);
 	i16 w = PS2_AnologData(PSS_LX) - 128; //左摇杆x轴坐标
 	i16 z = PS2_AnologData(PSS_LY);
-	if(x>-20&&x<20) x=0;	//设置死区
-	if(y>-20&&y<20) y=0;
-	if(w>-40&&w<40) w=0;
+
+	if(x>-50&&x<50)x=0;		//设置死区
+	if(y>-50&&y<50)y=0;
+	if(w>-50&&w<50)w=0;
 	if(z<30)z=-2; else if(z>220)z=2; else z=0;
 	
 	float vx = 2.5 * (float)x / 128;	//x、y坐标映射为小车x、y方向分速度（最大2m/s）
@@ -92,20 +93,22 @@ void ps2_angle(void){		//调方向模式，打靶
 }
 
 void ps2_speed(void){		//正常前进模式	
+//	printf("{# %5d %5d %5d %5d }$\r\n",PS2_AnologData(PSS_LX),PS2_AnologData(PSS_LY),
+//		                              PS2_AnologData(PSS_RX),PS2_AnologData(PSS_RY) );
 	
 	i16 x = PS2_AnologData(PSS_RX) - 128; //右摇杆x、y轴坐标
 	i16 y = 127 - PS2_AnologData(PSS_RY);
 	i16 w = PS2_AnologData(PSS_LX) - 128; //左摇杆x轴坐标
 	i16 z = PS2_AnologData(PSS_LY);
 	
-	if(x>-40&&x<40) x=0;	//设置死区
-	if(y>-40&&y<40) y=0;
-	if(w>-40&&w<40) w=0;
+	if(x>-50&&x<50)x=0;		//设置死区
+	if(y>-50&&y<50)y=0;
+	if(w>-50&&w<50)w=0;
 	if(z<30)z=-2; else if(z>220)z=2; else z=0;
 	
 	float vx = 2.5 * (float)x / 128;	//x、y坐标映射为小车x、y方向分速度（最大2m/s）
 	float vy = 2.5 * (float)y / 128;
-	float ww = 4 * (float)w / 128;		//w坐标映射为小车转速（最大3rad/s）
+	float ww = 3 * (float)w / 128;		//w坐标映射为小车转速（最大 rad/s）
 	
 //	printf("vx= %f\r\n vy= %f\r\n ww= %f\r\n",vx,vy,ww);
 	
@@ -267,8 +270,8 @@ void stop(void)         //停止
 void direction_change(void)
 {
 
-	v_x = 1.2f * (float)dirx / 128;	//x、y坐标映射为小车x、y方向分速度（最大0.6m/s）
-	v_y = 1.2f * (float)diry / 128;
+	v_x = 2.5f * (float)dirx / 128;	//x、y坐标映射为小车x、y方向分速度（最大2m/s）
+	v_y = 2.5f * (float)diry / 128;
     w_w = 3.0f * (float)dirw / 128;		//w坐标映射为小车转速（最大6rad/s）
 	Forward_R.target_speed = mul*(v_y - v_x) + w_w*(a+b);
 	Forward_L.target_speed = mul*(v_y + v_x) - w_w*(a+b);
